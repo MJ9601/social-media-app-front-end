@@ -18,4 +18,10 @@ const Wrap = styled.div`
   width: 80%;
   display: flex;
   align-items: center;
+  @media (max-width: 1500px) {
+    width: 95%;
+  }
+  @media (max-width: 610px) {
+    width: 98%;
+  }
 `;

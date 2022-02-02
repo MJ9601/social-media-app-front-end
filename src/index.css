@@ -14,10 +14,22 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
-    
+}
+
+.setting-icon {
+  color: #fff !important;
+  font-size: 2rem !important;
+  cursor: pointer !important;
+  display: none !important;
+}
+@media (max-width: 610px) {
+  .setting-icon {
+    display: block !important;
+  }
 }

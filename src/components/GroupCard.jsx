@@ -9,7 +9,10 @@ const GroupCard = () => {
       <Avatar src="" sx={{ bgcolor: "orange" }}>
         u
       </Avatar>
-      <h1>username</h1>
+      <div>
+        <h1>username</h1>
+        <p>last message</p>
+      </div>
     </Wrap>
   );
 };
@@ -25,10 +28,11 @@ const Wrap = styled.div`
   margin: 0.2rem 0;
   gap: 1.3rem;
   transition: all 0.4s ease-in-out;
-  > h1 {
-    margin-top: -0.5rem;
-    font-weight: 400;
+  > div {
     color: #eee;
+    > h1 {
+      font-weight: 500;
+    }
   }
   &:hover {
     background-color: rgba(200, 200, 200, 0.1);

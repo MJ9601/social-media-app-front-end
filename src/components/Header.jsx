@@ -23,6 +23,7 @@ const Wrap = styled.div`
     font-weight: 500;
     text-transform: Capitalize;
     letter-spacing: 0.1rem;
+    margin-bottom: 0.4rem;
     > span {
       color: green;
     }

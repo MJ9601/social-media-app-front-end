@@ -1,42 +1,50 @@
 import { Search, Settings } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import GroupCard from "./GroupCard";
+import Setting from "./Setting";
 
 const Sidebar = () => {
+  const [isShow, setIsShow] = useState(false);
+  const [showSetting, setShowSetting] = useState(false);
   return (
-    <Wrap>
-      <UserInfoWrap>
-        <div>
-          <Avatar src="">name</Avatar>
-          <Info>
-            <h1>username</h1>
-            <p>user@email.com</p>
-          </Info>
-        </div>
-        <IconButton
-          sx={{ ":hover": { backgroundColor: "rgb(200, 200, 200)" } }}
-        >
-          <Settings
-            sx={{
-              color: "#eee",
-              fontSize: "2rem",
-              ":hover": { color: "#000" },
-            }}
-          />
-        </IconButton>
-      </UserInfoWrap>
-      <SearchWrap>
-        <input type="text" placeholder="Search ..." />
-        <Search sx={{ color: "#eee" }} />
-        <input type="submit" style={{ display: "none" }} />
-      </SearchWrap>
-      <GroupWrapper>
-        <GroupCard />
-        <GroupCard />
-        <GroupCard />
-      </GroupWrapper>
+    <Wrap isShow={isShow}>
+      {!showSetting ? (
+        <>
+          <UserInfoWrap>
+            <div>
+              <Avatar src="">name</Avatar>
+              <Info>
+                <h1>username</h1>
+                <p>user@email.com</p>
+              </Info>
+            </div>
+            <IconButton
+              sx={{ ":hover": { backgroundColor: "rgb(200, 200, 200)" } }}
+              onClick={() => setShowSetting(true)}
+            >
+              <Settings
+                sx={{
+                  color: "#eee",
+                  fontSize: "2rem",
+                  ":hover": { color: "#000" },
+                }}
+              />
+            </IconButton>
+          </UserInfoWrap>
+          <SearchWrap>
+            <input type="text" placeholder="Search ..." />
+            <Search sx={{ color: "#eee" }} />
+          </SearchWrap>
+          <GroupWrapper>
+            <GroupCard />
+            <GroupCard />
+          </GroupWrapper>
+        </>
+      ) : (
+        <Setting setShowSetting={setShowSetting} />
+      )}
     </Wrap>
   );
 };
@@ -46,6 +54,7 @@ const Wrap = styled.div`
   height: 100%;
   width: 20%;
   max-width: 50rem;
+  min-width: 25rem;
   padding: 0 1.5rem;
   position: relative;
   &:after {
@@ -56,6 +65,17 @@ const Wrap = styled.div`
     width: 0.1rem;
     height: 100%;
     background: linear-gradient(to bottom, transparent, #eee, transparent);
+  }
+  @media (max-width: 601px) {
+    padding-top: 0.5rem;
+    position: fixed;
+    width: 100%;
+    max-width: 100%;
+    background-color: rgba(30, 30, 30, 1);
+    z-index: 100;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+    left: ${(props) => (props.isShow ? 0 : "-100%")};
   }
 `;
 const UserInfoWrap = styled.div`

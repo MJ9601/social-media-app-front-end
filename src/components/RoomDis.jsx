@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import HeaderRoom from "./HeaderRoom";
 import Message from "./Message";
 import MessageSender from "./MessageSender";
+import SearchMsg from "./SearchMsg";
 
 const RoomDis = () => {
   return (
@@ -12,6 +13,16 @@ const RoomDis = () => {
         <Message />
         <Message />
         <Message />
+        <Message />
+        <Message />
+        <Message />
+        <Message />
+        <Message />
+        <Message />
+        <Message />
+        <Message />
+        <Message />
+        <SearchMsg />
       </MsgWrapper>
       <MessageSender />
     </Wrap>
@@ -24,11 +35,15 @@ const Wrap = styled.div`
   margin: 0 auto;
   height: 100%;
   position: relative;
+  @media (max-width: 610px) {
+    width: 100%;
+  }
 `;
 const MsgWrapper = styled.div`
-  width: 70vw;
+  position: relative;
+  overflow-x: hidden;
+  width: 100%;
+  padding: 1rem 1.5rem;
   overflow-y: auto;
-  display: table-cell;
-  vertical-align: bottom;
   height: calc(100vh - 15rem);
 `;

@@ -21,6 +21,7 @@ const Wrap = styled.div`
   background-color: rgba(0, 0, 0, 0.9);
   width: 100%;
   height: 100vh;
+  overflow: hidden;
 `;
 const Container = styled.div`
   width: 100%;
