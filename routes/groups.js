@@ -145,6 +145,26 @@ router.delete("/:adminId/", async (req, res) => {
             .clone()
             .catch((err) => res.status(501).send(err));
         }
+        // for (const member of firstResp.members) {
+        //   await User.findById(member, async (err, secondResp) =>
+        //     err
+        //       ? res.status(500).send(err)
+        //       : await User.findByIdAndUpdate(
+        //           member,
+        //           {
+        //             $set: {
+        //               groups: secondResp.groups.filter(
+        //                 (group) => group != firstResp._id
+        //               ),
+        //             },
+        //           },
+        //           { new: true },
+        //           (err, thirdResp) => err && res.status(500).send(err)
+        //         )
+        //           .clone()
+        //           .catch((err) => res.status(501).send(err))
+        //   );
+        // }
         await Group.deleteOne({ _id: firstResp._id }, (err, lastResp) =>
           err ? res.status(500).send(err) : res.status(200).send(lastResp)
         )
@@ -161,31 +181,26 @@ router.delete("/:adminId/", async (req, res) => {
 
 // search for group
 
-// get messages
-router.get("/:id/messages", async (req, res) => {
-  await Group.findById(req.params?.id)
-    .populate({
-      path: "messages",
-      module: "Message",
-      populate: { path: "creater", module: "User" },
-      populate: { path: "forwardBy", module: "User" },
-      populate: { path: "onReplyTo", module: "Message" },
-    })
+// get group with messages and users
+router.get("/:groupId", async (req, res) => {
+  await Group.findById(req.params?.groupId)
+    .populate([
+      {
+        path: "messages",
+        model: "Message",
+        populate: [
+          { path: "creater", model: "User" },
+          { path: "forwardBy", model: "User" },
+          { path: "onReplyTo", model: "Message" },
+        ],
+      },
+      { path: "members", model: "User" },
+    ])
     .exec((err, fristResp) =>
       err ? res.status(500).send(err) : res.status(200).send(fristResp)
     );
 });
 
 // get users
-router.get("/:id/users", async (req, res) => {
-  await Group.findById(req.params?.id)
-    .populate({
-      path: "members",
-      module: "User",
-    })
-    .exec((err, fristResp) =>
-      err ? res.status(500).send(err) : res.status(200).send(fristResp)
-    );
-});
 
 module.exports = router;

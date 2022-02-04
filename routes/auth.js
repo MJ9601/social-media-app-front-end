@@ -35,9 +35,22 @@ router.post("/login", async (req, res) => {
     (!req.body || req.body == "") &&
       res.status(500).send("update request body!!");
 
-    await User.findOne(
-      { username: req.body?.username },
-      async (err, firstResp) => {
+    await User.findOne({ username: req.body?.username })
+      .populate({
+        path: "groups",
+        model: "Group",
+        populate: [
+          {
+            path: "members",
+            Model: "User",
+          },
+          {
+            path: "messages",
+            Model: "Message",
+          },
+        ],
+      })
+      .exec(async (err, firstResp) => {
         err && res.status(400).send({ err: err, msg: "Wrong Credentials" });
         const passValidation = await bcrypt.compare(
           req.body?.password,
@@ -46,10 +59,7 @@ router.post("/login", async (req, res) => {
         !passValidation && res.status(400).send({ error: "Wrong Credentials" });
         const { password, ...others } = firstResp?._doc;
         res.status(200).send(others);
-      }
-    )
-      .clone()
-      .catch((err) => res.status(501).send(err));
+      });
   } catch (error) {
     res.status(500).send(error);
   }
@@ -169,6 +179,31 @@ router.get("/profiles", async (req, res) => {
   )
     .clone()
     .catch((err) => res.status(501).send(err));
+});
+
+//get user info
+
+router.get("/profile/:userId", async (req, res) => {
+  await User.findById(req.params.userId)
+    .populate({
+      path: "groups",
+      model: "Group",
+      populate: [
+        {
+          path: "members",
+          Model: "User",
+        },
+        {
+          path: "messages",
+          Model: "Message",
+        },
+      ],
+    })
+    .exec((err, resp) => {
+      err && res.status(500).send(err);
+      const { password, ...others } = resp._doc;
+      res.status(200).send(others);
+    });
 });
 
 module.exports = router;
