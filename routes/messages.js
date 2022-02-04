@@ -40,7 +40,9 @@ router.post("/createMessage", async (req, res) => {
         );
       else if (firstResp.isChannel && firstResp.admin !== req.body.createrId)
         res.status(403).send("Not Allowed");
-    });
+    })
+      .clone()
+      .catch((err) => res.status(501).send(err));
   } catch (error) {
     res.status(500).send(error);
   }
@@ -78,25 +80,38 @@ router.put("/forward", async (req, res) => {
   try {
     (!req.body || req.body == "") &&
       res.status(500).send("update request body");
-    await Group.findByIdAndUpdate(
-      req.query.groupId,
-      { $addToSet: { messages: req.body?.msgId } },
-      { new: true },
-      async (err, firstResp) =>
-        err
-          ? res.status(500).send(err)
-          : await Message.findByIdAndUpdate(
-              req.body?.msgId,
-              { $set: { forwardBy: req.body.forwarderId } },
-              { new: true },
-              (err, lastResp) =>
-                err ? res.status(500).send(err) : res.status(201).send(lastResp)
-            )
-              .clone()
-              .catch((err) => res.status(501).send(err))
-    )
-      .clone()
-      .catch((err) => res.status(501).send(err));
+      await Group.findById(req.query.groupId, async (err, firstResp) => {
+        err && res.status(500).send(err);
+        if (
+          !firstResp.isChannel ||
+          (firstResp.isChannel && firstResp.admin == req.body.createrId)
+        )
+          await Group.findByIdAndUpdate(
+            req.query.groupId,
+            { $addToSet: { messages: req.body?.msgId } },
+            { new: true },
+            async (err, firstResp) =>
+              err
+                ? res.status(500).send(err)
+                : await Message.findByIdAndUpdate(
+                    req.body?.msgId,
+                    { $set: { forwardBy: req.body.forwarderId } },
+                    { new: true },
+                    (err, lastResp) =>
+                      err
+                        ? res.status(500).send(err)
+                        : res.status(201).send(lastResp)
+                  )
+                    .clone()
+                    .catch((err) => res.status(501).send(err))
+          )
+            .clone()
+            .catch((err) => res.status(501).send(err));
+        else if (firstResp.isChannel && firstResp.admin !== req.body.createrId)
+          res.status(403).send("Not Allowed");
+      })
+        .clone()
+        .catch((err) => res.status(501).send(err));
   } catch (error) {
     res.status(500).send(error);
   }
