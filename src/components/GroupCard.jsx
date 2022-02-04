@@ -25,7 +25,7 @@ const Wrap = styled.div`
   align-items: center;
   padding: 0.7rem 1rem;
   border-radius: 3rem;
-  margin: 0.2rem 0;
+  margin: 0.4rem 0;
   gap: 1.3rem;
   transition: all 0.4s ease-in-out;
   > div {

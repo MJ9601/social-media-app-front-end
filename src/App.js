@@ -1,17 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled from "styled-components";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import { useSelector } from "react-redux";
+import { selectUser } from "./features/userSlice";
 
 function App() {
+  const user = useSelector(selectUser);
+  useEffect(() => {}, [user]);
   return (
     <Wrap>
       <Header />
-      <Container>
-        {/* <Login /> */}
-        <Home />
-      </Container>
+      <Container>{!user ? <Login /> : <Home />}</Container>
     </Wrap>
   );
 }

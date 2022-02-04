@@ -1,35 +1,48 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
 
 const Login = () => {
   const [isUser, setIsUser] = useState(true);
+  const loginRef = useRef();
+  const signupRef = useRef();
+  const handleSignin = async (e) => {
+    e.preventDefault();
+    const formInputs = [...loginRef.current.elements].map((element) => ({
+      name: element.name,
+      value: element.value,
+    }));
+    console.log(formInputs);
+  };
+  const handleSignup = async (e) => {
+    e.preventDefault();
+  };
   return (
     <Wrap>
       <h1>
         Chat<span>A</span>pp
       </h1>
       {isUser ? (
-        <Form>
+        <Form ref={loginRef}>
           <label htmlFor="">Username</label>
-          <input type="text" />
+          <input type="text" name="email" />
           <label htmlFor="">Password</label>
-          <input type="password" />
-          <Button>Sign In</Button>
+          <input type="password" name="password" />
+          <Button onClick={handleSignin}>Sign In</Button>
           <ForgetWrap>
             <a href="#">Forget your password?</a>
           </ForgetWrap>
         </Form>
       ) : (
-        <Form>
+        <Form ref={signupRef}>
           <label htmlFor="">Full name</label>
-          <input type="text" />
+          <input type="text" name="fullName"/>
           <label htmlFor="">Email</label>
-          <input type="email" />
+          <input type="email" name="email"/>
           <label htmlFor="">Password</label>
-          <input type="password" />
+          <input type="password" name="password"/>
           <label htmlFor="">Repeat password</label>
           <input type="password" />
-          <Button>Sign Up</Button>
+          <Button onClick={handleSignup}>Sign Up</Button>
         </Form>
       )}
       <OrDiv>
@@ -57,7 +70,7 @@ const Wrap = styled.div`
     text-align: center;
     font-weight: 500;
     > span {
-      color: green;
+      color: var(--primary);
     }
   }
 `;

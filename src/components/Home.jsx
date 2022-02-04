@@ -1,5 +1,8 @@
 import React from "react";
 import styled from "styled-components";
+import CreateGroupPopUp from "./CreateGroupPopUp";
+import DeletePopUp from "./DeletePopUp";
+import ForwardPopUp from "./ForwardPopUp";
 import RoomDis from "./RoomDis";
 import Sidebar from "./Sidebar";
 
@@ -8,6 +11,9 @@ const Home = () => {
     <Wrap>
       <Sidebar />
       <RoomDis />
+      {/* <DeletePopUp /> */}
+      {/* <CreateGroupPopUp /> */}
+      <ForwardPopUp />
     </Wrap>
   );
 };
@@ -15,6 +21,7 @@ const Home = () => {
 export default Home;
 const Wrap = styled.div`
   height: 100%;
+  position: relative;
   width: 80%;
   display: flex;
   align-items: center;

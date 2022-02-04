@@ -2,6 +2,7 @@ import { Avatar } from "@mui/material";
 import { ArrowForward } from "@mui/icons-material";
 import React from "react";
 import styled from "styled-components";
+import { Button, ButtonDel } from "./Buttons";
 
 const Setting = ({ setShowSetting }) => {
   return (
@@ -25,12 +26,15 @@ const Setting = ({ setShowSetting }) => {
       <Form>
         <label htmlFor="">Full name</label>
         <input type="text" />
+        <label htmlFor="">Id</label>
+        <input type="text" placeholder="@ ..." />
         <label htmlFor="">New password</label>
         <input type="password" />
         <label htmlFor=""> Password</label>
         <input type="password" />
-        <Button>Update Profile</Button>
+        <Button text="Update Profile" action={""} />
       </Form>
+      <ButtonDel text="Delete Account" action={""} />
     </>
   );
 };
@@ -62,6 +66,7 @@ const Form = styled.form`
   margin-top: 10rem;
   display: flex;
   flex-direction: column;
+  height: calc(100vh - 25rem);
   color: #eee;
   > label {
     font-size: 1.4rem;
@@ -79,20 +84,7 @@ const Form = styled.form`
     &:focus {
       outline: none;
       background-color: green;
+      color: #eee;
     }
-  }
-`;
-const Button = styled.button`
-  width: 100%;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 3rem;
-  font-size: 1.4rem;
-  transition: all 0.4s ease-in-out;
-  &:focus,
-  &:hover {
-    outline: none;
-    background-color: green;
-    color: #fff;
   }
 `;

@@ -2,7 +2,9 @@ import { Search, Settings } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
 import React, { useState } from "react";
 import styled from "styled-components";
+import { Button } from "./Buttons";
 import GroupCard from "./GroupCard";
+import GroupSetting from "./GroupSetting";
 import Setting from "./Setting";
 
 const Sidebar = () => {
@@ -38,12 +40,14 @@ const Sidebar = () => {
             <Search sx={{ color: "#eee" }} />
           </SearchWrap>
           <GroupWrapper>
+            <Button text="+ Create Group or Channel" />
             <GroupCard />
             <GroupCard />
           </GroupWrapper>
         </>
       ) : (
-        <Setting setShowSetting={setShowSetting} />
+        // <Setting setShowSetting={setShowSetting} />
+        <GroupSetting />
       )}
     </Wrap>
   );
