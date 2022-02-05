@@ -10,7 +10,7 @@ router.post("/register", async (req, res) => {
       res.status(500).send("update the request body!!");
 
     const salt = await bcrypt.genSalt(10);
-    const hashPass = await bcrypt.hash(req.body.password, salt);
+    const hashPass = await bcrypt.hash(req.body?.password, salt);
 
     const newUser = new User({
       username: req.body.email,
@@ -18,11 +18,14 @@ router.post("/register", async (req, res) => {
       password: hashPass,
     });
 
-    await newUser.save(async (err, resp) => {
-      err && res.status(501).send(err);
-      const { password, ...others } = resp?._doc;
-      res.status(201).send(others);
-    });
+    await newUser
+      .save(async (err, resp) => {
+        err && res.status(501).send(err);
+        const { password, ...others } = resp?._doc;
+        res.status(201).send(others);
+      })
+      .clone()
+      .catch((err) => res.status(501).send(err));
   } catch (error) {
     res.status(500).send(err);
   }
@@ -34,32 +37,41 @@ router.post("/login", async (req, res) => {
   try {
     (!req.body || req.body == "") &&
       res.status(500).send("update request body!!");
-
-    await User.findOne({ username: req.body?.username })
-      .populate({
-        path: "groups",
-        model: "Group",
-        populate: [
-          {
-            path: "members",
-            Model: "User",
-          },
-          {
-            path: "messages",
-            Model: "Message",
-          },
-        ],
-      })
-      .exec(async (err, firstResp) => {
-        err && res.status(400).send({ err: err, msg: "Wrong Credentials" });
-        const passValidation = await bcrypt.compare(
-          req.body?.password,
-          firstResp.password
-        );
-        !passValidation && res.status(400).send({ error: "Wrong Credentials" });
-        const { password, ...others } = firstResp?._doc;
-        res.status(200).send(others);
-      });
+    await User.findOne({ username: req.body?.username }, async (err, resp) => {
+      err && res.status(500).send(err);
+      if (!resp) res.status(400).send({ msg: "Wrong Credentials" });
+      else {
+        await User.findOne({ username: req.body?.username })
+          .populate({
+            path: "groups",
+            model: "Group",
+            populate: [
+              {
+                path: "members",
+                Model: "User",
+              },
+              {
+                path: "messages",
+                Model: "Message",
+              },
+            ],
+          })
+          .exec(async (err, firstResp) => {
+            err && res.status(500).send(err);
+            !firstResp && res.status(400).send({ msg: "Wrong Credentials" });
+            const passValidation = await bcrypt.compare(
+              req.body?.password,
+              firstResp?.password
+            );
+            !passValidation &&
+              res.status(400).send({ error: "Wrong Credentials" });
+            const { password, ...others } = firstResp?._doc;
+            res.status(200).send(others);
+          });
+      }
+    })
+      .clone()
+      .catch((err) => res.status(501).send(err));
   } catch (error) {
     res.status(500).send(error);
   }
@@ -81,28 +93,41 @@ router.put("/update/:id", async (req, res) => {
       );
       !passValidation && res.status(400).send("Wrong Credentials!");
 
-      const salt = await bcrypt.genSalt(10);
-      if (req.body?.newPassword)
-        passValidation = await bcrypt.hash(req.body?.newPassword, salt);
       const updatedProfile = {
         fullName: req.body?.fullName,
-        password: passValidation,
         imgUrl: req.body?.imgUrl,
         customeId: req.body?.customeId,
       };
+      const salt = await bcrypt.genSalt(10);
+      if (req.body?.newPassword) {
+        const hashPass = await bcrypt.hash(req.body?.newPassword, salt);
+        updatedProfile["password"] = hashPass;
+      }
 
       User.findByIdAndUpdate(
         firstResp._id,
         { $set: updatedProfile },
-        { new: true },
-        (err, secondResp) => {
-          err && res.status(501).send(err);
-          const { password, ...others } = secondResp._doc;
-          res.status(201).send(others);
-        }
+        { new: true }
       )
-        .clone()
-        .catch((err) => res.status(500).send(err));
+        .populate({
+          path: "groups",
+          model: "Group",
+          populate: [
+            {
+              path: "members",
+              Model: "User",
+            },
+            {
+              path: "messages",
+              Model: "Message",
+            },
+          ],
+        })
+        .exec(async (err, secondResp) => {
+          err && res.status(500).send(err);
+          const { password, ...others } = secondResp?._doc;
+          res.status(200).send(others);
+        });
     })
       .clone()
       .catch((err) => res.status(500).send(err));
