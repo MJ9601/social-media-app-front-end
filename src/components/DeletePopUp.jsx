@@ -1,25 +1,30 @@
 import React from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectDelUser } from "../features/displaySlice";
 import { Button, ButtonDel } from "./Buttons";
 
-const DeletePopUp = ({ name }) => {
+const DeletePopUp = () => {
+  const delUser = useSelector(selectDelUser);
   return (
-    <Wrap>
-      <Container>
-        <h2>
-          You are about to delete <span>{"name"}</span>. The process is
-          irreversible.
-        </h2>
-        <p>Are you sure? </p>
-        <div>
-          <input type="password" placeholder="Password .." />
+    <>
+      <Wrap>
+        <Container>
+          <h2>
+            You are about to delete <span>{"name"}</span>. The process is
+            irreversible.
+          </h2>
+          <p>Are you sure? </p>
           <div>
-            <Button text="Cencel" />
-            <ButtonDel text="Delete" />
+            <input type="password" placeholder="Password .." />
+            <div>
+              <Button text="Cencel" />
+              <ButtonDel text="Delete" />
+            </div>
           </div>
-        </div>
-      </Container>
-    </Wrap>
+        </Container>
+      </Wrap>
+    </>
   );
 };
 

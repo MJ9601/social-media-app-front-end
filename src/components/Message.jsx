@@ -3,13 +3,13 @@ import { IconButton } from "@mui/material";
 import React, { useState } from "react";
 import styled from "styled-components";
 
-const Message = ({ onSearch }) => {
+const Message = ({ isSearch }) => {
   const [isUser, setIsUser] = useState(false);
   const [showOp, setShowOp] = useState(false);
   return (
-    <Wrap isUser={isUser} onSearch={onSearch}>
+    <Wrap isUser={isUser} isSearch={isSearch}>
       <ContentWrap isUser={isUser}>
-        {!onSearch && (
+        {!isSearch && (
           <>
             <KeyboardArrowDown
               sx={{
@@ -41,7 +41,7 @@ const Message = ({ onSearch }) => {
         </h1>
         <p>date</p>
       </ContentWrap>
-      {!onSearch && (
+      {!isSearch && (
         <IconButton sx={{ ml: ".4rem" }}>
           {!isUser && (
             <Reply
@@ -62,7 +62,7 @@ const Wrap = styled.div`
   height: fit-content;
   max-width: 80rem;
   display: flex;
-  cursor: ${(props) => props.onSearch && "pointer"};
+  cursor: ${(props) => props.isSearch && "pointer"};
 `;
 
 const ContentWrap = styled.div`

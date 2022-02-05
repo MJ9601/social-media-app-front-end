@@ -1,20 +1,36 @@
+import axios from "../axios";
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
+import { signInFunc, signUpFunc } from "../requestAxios";
+import { useDispatch } from "react-redux";
+import { LOGIN } from "../features/userSlice";
 
 const Login = () => {
   const [isUser, setIsUser] = useState(true);
+  const [err, setErr] = useState("");
   const loginRef = useRef();
   const signupRef = useRef();
+  const dispatch = useDispatch();
+  const [pass, setPass] = useState("");
+  const [rePass, setRePass] = useState("");
+  const [matchPass, setMatchPass] = useState(false);
+
   const handleSignin = async (e) => {
     e.preventDefault();
-    const formInputs = [...loginRef.current.elements].map((element) => ({
-      name: element.name,
-      value: element.value,
-    }));
-    console.log(formInputs);
+    const resp = await signInFunc(loginRef);
+    if (resp.status !== 200) setErr("Wrong password or username!");
+    else {
+      dispatch(LOGIN(resp.data));
+    }
   };
+
   const handleSignup = async (e) => {
     e.preventDefault();
+    if (pass != rePass) setMatchPass(true);
+    else {
+      const resp = await signUpFunc(signupRef);
+      dispatch(LOGIN(resp.data));
+    }
   };
   return (
     <Wrap>
@@ -28,6 +44,7 @@ const Login = () => {
           <label htmlFor="">Password</label>
           <input type="password" name="password" />
           <Button onClick={handleSignin}>Sign In</Button>
+          {err && <h3>{err}</h3>}
           <ForgetWrap>
             <a href="#">Forget your password?</a>
           </ForgetWrap>
@@ -35,13 +52,23 @@ const Login = () => {
       ) : (
         <Form ref={signupRef}>
           <label htmlFor="">Full name</label>
-          <input type="text" name="fullName"/>
+          <input type="text" name="fullName" />
           <label htmlFor="">Email</label>
-          <input type="email" name="email"/>
+          <input type="email" name="email" />
           <label htmlFor="">Password</label>
-          <input type="password" name="password"/>
+          <input
+            type="password"
+            name="password"
+            value={pass}
+            onChange={(e) => setPass(e.target.value)}
+          />
           <label htmlFor="">Repeat password</label>
-          <input type="password" />
+          <input
+            type="password"
+            value={rePass}
+            onChange={(e) => setRePass(e.target.value)}
+          />
+          {matchPass && <h3>Passwords do not match!1</h3>}
           <Button onClick={handleSignup}>Sign Up</Button>
         </Form>
       )}
@@ -80,6 +107,11 @@ const Form = styled.form`
   margin: auto;
   display: flex;
   flex-direction: column;
+  > h3 {
+    color: red;
+    font-size: 1.4rem;
+    margin: 1rem 0;
+  }
   > label {
     padding-left: 2rem;
     font-size: 1.5rem;

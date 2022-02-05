@@ -1,11 +1,16 @@
 import React from "react";
 import styled from "styled-components";
+import { useDispatch } from "react-redux";
+import { ToggleDelUser } from "../features/displaySlice";
 
 export const Button = ({ text, action }) => {
   return <Button_>{text}</Button_>;
 };
-export const ButtonDel = ({ text, action }) => {
-  return <ButtonDel_>{text}</ButtonDel_>;
+export const ButtonDel = ({ text, isUser }) => {
+  const dispatch = useDispatch();
+  return (
+    <ButtonDel_ onClick={() => dispatch(ToggleDelUser)}>{text}</ButtonDel_>
+  );
 };
 
 const Button_ = styled.button`

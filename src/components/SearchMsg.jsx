@@ -6,15 +6,15 @@ import Message from "./Message";
 const SearchMsg = () => {
   const [show, setShow] = useState(true);
   return (
-    <Wrap onShow={show}>
+    <Wrap isShow={show}>
       <SearchWrap>
         <input type="text" placeholder="Search ..." />
         <Search sx={{ color: "#eee" }} />
       </SearchWrap>
       <MsgWrap>
-        <Message onSearch={true} />
-        <Message onSearch={true} />
-        <Message onSearch={true} />
+        <Message isSearch={true} />
+        <Message isSearch={true} />
+        <Message isSearch={true} />
       </MsgWrap>
     </Wrap>
   );
@@ -25,7 +25,7 @@ const Wrap = styled.div`
   padding: 1rem;
   position: absolute;
   top: 0;
-  right: ${(props) => (props.onShow ? 0 : "-100%")};
+  right: ${(props) => (props.isShow ? 0 : "-100%")};
   height: 100%;
   width: 30rem;
   background-color: #222;

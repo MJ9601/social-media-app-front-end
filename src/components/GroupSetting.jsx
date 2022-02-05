@@ -7,7 +7,7 @@ import GroupCard from "./GroupCard";
 
 const GroupSetting = () => {
   return (
-    <>
+    <Wrapper>
       <Wrap>
         <div>
           <Avatar src="">name</Avatar>
@@ -64,11 +64,39 @@ const GroupSetting = () => {
           <ButtonDel text="Delete" />
         </ButtonWrap>
       </Container>
-    </>
+    </Wrapper>
   );
 };
 
 export default GroupSetting;
+const Wrapper = styled.div`
+  height: 100%;
+  width: 20%;
+  max-width: 50rem;
+  min-width: 25rem;
+  padding: 0 1.5rem;
+  position: relative;
+  &:after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    content: "";
+    width: 0.1rem;
+    height: 100%;
+    background: linear-gradient(to bottom, transparent, #eee, transparent);
+  }
+  @media (max-width: 601px) {
+    padding-top: 0.5rem;
+    position: fixed;
+    width: 100%;
+    max-width: 100%;
+    background-color: rgba(30, 30, 30, 1);
+    z-index: 100;
+    top: 0;
+    transition: all 0.3s ease-in-out;
+    left: ${(props) => (props.isShow ? 0 : "-100%")};
+  }
+`;
 const Wrap = styled.div`
   display: flex;
   align-items: center;

@@ -1,7 +1,9 @@
 import { Search, Settings } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectUser } from "../features/userSlice";
 import { Button } from "./Buttons";
 import GroupCard from "./GroupCard";
 import GroupSetting from "./GroupSetting";
@@ -10,16 +12,18 @@ import Setting from "./Setting";
 const Sidebar = () => {
   const [isShow, setIsShow] = useState(false);
   const [showSetting, setShowSetting] = useState(false);
+  const user = useSelector(selectUser);
+
   return (
     <Wrap isShow={isShow}>
       {!showSetting ? (
         <>
           <UserInfoWrap>
             <div>
-              <Avatar src="">name</Avatar>
+              <Avatar src={user?.imgUrl}>{user.fullName[0]}</Avatar>
               <Info>
-                <h1>username</h1>
-                <p>user@email.com</p>
+                <h1>{user.fullName}</h1>
+                <p>{user?.customeId}</p>
               </Info>
             </div>
             <IconButton
@@ -41,13 +45,14 @@ const Sidebar = () => {
           </SearchWrap>
           <GroupWrapper>
             <Button text="+ Create Group or Channel" />
-            <GroupCard />
-            <GroupCard />
+            {user?.groups.map((group) => (
+              <GroupCard key={group._id} groupInfo={group} />
+            ))}
           </GroupWrapper>
         </>
       ) : (
-        // <Setting setShowSetting={setShowSetting} />
-        <GroupSetting />
+        <Setting setShowSetting={setShowSetting} />
+        // <GroupSetting />
       )}
     </Wrap>
   );
@@ -95,7 +100,8 @@ const UserInfoWrap = styled.div`
 `;
 const Info = styled.div`
   > h1 {
-    font-wieght: 400;
+    font-weight: 600;
+    font-size: 1.4rem;
     color: #eee;
   }
   > p {

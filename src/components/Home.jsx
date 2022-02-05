@@ -1,19 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import CreateGroupPopUp from "./CreateGroupPopUp";
 import DeletePopUp from "./DeletePopUp";
 import ForwardPopUp from "./ForwardPopUp";
+import GroupSetting from "./GroupSetting";
 import RoomDis from "./RoomDis";
 import Sidebar from "./Sidebar";
 
 const Home = () => {
+  const [isGroup, setIsGroup] = useState(false);
   return (
     <Wrap>
-      <Sidebar />
+      {!isGroup ? <Sidebar /> : <GroupSetting />}
       <RoomDis />
       {/* <DeletePopUp /> */}
       {/* <CreateGroupPopUp /> */}
-      <ForwardPopUp />
+      {/* <ForwardPopUp /> */}
     </Wrap>
   );
 };
