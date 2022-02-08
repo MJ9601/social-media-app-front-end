@@ -10,6 +10,9 @@ const MessageSchema = new Schema(
     fileUrl: {
       type: String,
     },
+    fileType: {
+      type: String,
+    },
     creater: { type: Schema.Types.ObjectId, ref: "User", required: true },
     onReplyTo: { type: Schema.Types.ObjectId, ref: "Message" },
     forwardBy: { type: Schema.Types.ObjectId, ref: "User" },

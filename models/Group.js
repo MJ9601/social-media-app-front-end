@@ -14,6 +14,10 @@ const GroupSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
     admin: {
       type: Schema.Types.ObjectId,
       ref: "User",

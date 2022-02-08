@@ -18,16 +18,13 @@ router.post("/register", async (req, res) => {
       password: hashPass,
     });
 
-    await newUser
-      .save(async (err, resp) => {
-        err && res.status(501).send(err);
-        const { password, ...others } = resp?._doc;
-        res.status(201).send(others);
-      })
-      .clone()
-      .catch((err) => res.status(501).send(err));
+    await newUser.save(async (err, resp) => {
+      err && res.status(501).send(err);
+      const { password, ...others } = resp?._doc;
+      res.status(201).send(others);
+    });
   } catch (error) {
-    res.status(500).send(err);
+    res.status(500).send(error);
   }
 });
 
@@ -91,43 +88,44 @@ router.put("/update/:id", async (req, res) => {
         req.body?.password,
         firstResp.password
       );
-      !passValidation && res.status(400).send("Wrong Credentials!");
+      if (!passValidation) res.status(400).send("Wrong Credentials!");
+      else {
+        const updatedProfile = {
+          fullName: req.body?.fullName,
+          imgUrl: req.body?.imgUrl,
+          customeId: req.body?.customeId,
+        };
+        const salt = await bcrypt.genSalt(10);
+        if (req.body?.newPassword) {
+          const hashPass = await bcrypt.hash(req.body?.newPassword, salt);
+          updatedProfile["password"] = hashPass;
+        }
 
-      const updatedProfile = {
-        fullName: req.body?.fullName,
-        imgUrl: req.body?.imgUrl,
-        customeId: req.body?.customeId,
-      };
-      const salt = await bcrypt.genSalt(10);
-      if (req.body?.newPassword) {
-        const hashPass = await bcrypt.hash(req.body?.newPassword, salt);
-        updatedProfile["password"] = hashPass;
+        User.findByIdAndUpdate(
+          firstResp._id,
+          { $set: updatedProfile },
+          { new: true }
+        )
+          .populate({
+            path: "groups",
+            model: "Group",
+            populate: [
+              {
+                path: "members",
+                Model: "User",
+              },
+              {
+                path: "messages",
+                Model: "Message",
+              },
+            ],
+          })
+          .exec(async (err, secondResp) => {
+            err && res.status(500).send(err);
+            const { password, ...others } = secondResp?._doc;
+            res.status(200).send(others);
+          });
       }
-
-      User.findByIdAndUpdate(
-        firstResp._id,
-        { $set: updatedProfile },
-        { new: true }
-      )
-        .populate({
-          path: "groups",
-          model: "Group",
-          populate: [
-            {
-              path: "members",
-              Model: "User",
-            },
-            {
-              path: "messages",
-              Model: "Message",
-            },
-          ],
-        })
-        .exec(async (err, secondResp) => {
-          err && res.status(500).send(err);
-          const { password, ...others } = secondResp?._doc;
-          res.status(200).send(others);
-        });
     })
       .clone()
       .catch((err) => res.status(500).send(err));
@@ -140,21 +138,23 @@ router.put("/update/:id", async (req, res) => {
 
 router.delete("/delete/:id", async (req, res) => {
   await User.findById(req.params.id, async (err, firstResp) => {
-    err && res.status(500).send(err);
-    const validPass = await bcrypt.compare(
-      req.body.password,
-      firstResp.password
-    );
+    if (err) res.status(500).send(err);
+    else {
+      const validPass = await bcrypt.compare(
+        req.body?.password,
+        firstResp.password
+      );
 
-    !validPass
-      ? res.status(403).send("Wrong Credentials!")
-      : await User.findByIdAndDelete(req.params.id, (err, secondResp) =>
-          err
-            ? res.status(500).send(err)
-            : res.status(200).send("Profile has been deleted!")
-        )
-          .clone()
-          .catch((err) => res.status(501).send(err));
+      !validPass
+        ? res.status(403).send("Wrong Credentials!")
+        : await User.findByIdAndDelete(req.params.id, (err, secondResp) =>
+            err
+              ? res.status(500).send(err)
+              : res.status(200).send("Profile has been deleted!")
+          )
+            .clone()
+            .catch((err) => res.status(501).send(err));
+    }
   })
     .clone()
     .catch((err) => res.status(501).send(err));
