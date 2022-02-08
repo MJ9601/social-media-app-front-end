@@ -30,7 +30,7 @@ const Setting = ({ setShowSetting }) => {
 
       if (!file) {
         const resp = await updateProfileFunc(user._id, updateFormRef, "");
-        dispatch(LOGIN(resp.data));
+        resp.status == 200 && dispatch(LOGIN(resp.data));
       }
     }
   };
@@ -82,9 +82,9 @@ const Setting = ({ setShowSetting }) => {
           <ProgressBar
             file={file}
             setFile={setFile}
-            isUserProfile={true}
+            action="updateUser"
             setActive={setActive}
-            updateFormRef={updateFormRef}
+            formData={updateFormRef}
           />
         )}
         <label htmlFor="">Id</label>
@@ -101,7 +101,7 @@ const Setting = ({ setShowSetting }) => {
         {err && <h3>{err}</h3>}
         <ButtonSub onClick={updateUserProfile}>Update Profile</ButtonSub>
       </Form>
-      <ButtonDel text="Delete Account" isUser={true} />
+      <ButtonDel text="Delete Account" status="delUser" />
     </>
   );
 };

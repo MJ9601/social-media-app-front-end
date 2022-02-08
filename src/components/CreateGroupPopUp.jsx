@@ -1,49 +1,106 @@
 import { AttachFile } from "@mui/icons-material";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import {
+  selectCreateGroup,
+  setShowSettingGroupTrue,
+  ToggleCreateGroup,
+} from "../features/displaySlice";
+import { setSelectedGroup } from "../features/groupSlice";
+import { LOGIN, selectUser } from "../features/userSlice";
+import { createGroupFunc } from "../requestAxios";
 import { Button, ButtonDel } from "./Buttons";
+import ProgressBar from "./ProgressBar";
 
 const CreateGroupPopUp = () => {
   const [isChannel, setIsChannel] = useState(false);
+  const createGroup = useSelector(selectCreateGroup);
+  const [groupName, setGroupName] = useState("");
+  const [active, setActive] = useState(false);
+  const [file, setFile] = useState(null);
+  const acceptTypes = ["image/png", "image/jpg", "image/jpeg"];
+  const user = useSelector(selectUser);
+  const dispatch = useDispatch();
+
+  const createFunc = async () => {
+    if (groupName != "") {
+      if (file && acceptTypes.includes(file.type)) setActive(true);
+      else {
+        const resp = await createGroupFunc(
+          user._id,
+          [groupName, isChannel, false],
+          ""
+        );
+        if (resp.status == 200) {
+          dispatch(setSelectedGroup(resp.data));
+          dispatch(setShowSettingGroupTrue());
+        }
+        dispatch(ToggleCreateGroup());
+      }
+    }
+  };
+
   return (
-    <Wrap>
-      <Container>
-        <div>
-          <h1>
-            Create <span>{!isChannel ? "Group" : "Channel"}</span>
-          </h1>
-          <RadioDiv
-            onClick={() => setIsChannel(!isChannel)}
-            isChannel={isChannel}
-          >
-            <div></div>
-          </RadioDiv>
-        </div>
-        <FormWrap>
-          <InputWrap>
+    <>
+      {createGroup && (
+        <Wrap>
+          <Container>
             <div>
-              <label htmlFor="">Name</label>
-              <input type="text" />
+              <h1>
+                Create <span>{!isChannel ? "Group" : "Channel"}</span>
+              </h1>
+              <RadioDiv
+                onClick={() => setIsChannel(!isChannel)}
+                isChannel={isChannel}
+              >
+                <div></div>
+              </RadioDiv>
             </div>
-            <label htmlFor="groupPic">
-              <AttachFile
-                sx={{
-                  fontSize: "2rem",
-                  color: "#eee",
-                  cursor: "pointer",
-                  mx: ".5rem",
-                }}
-              />
-            </label>
-            <input type="file" style={{ display: "none" }} id="groupPic" />
-          </InputWrap>
-          <ButtonWrap>
-            <ButtonDel text="Cancel" />
-            <Button text="Create" />
-          </ButtonWrap>
-        </FormWrap>
-      </Container>
-    </Wrap>
+            <FormWrap>
+              <InputWrap>
+                <div>
+                  <label htmlFor="">Name</label>
+                  <input
+                    type="text"
+                    onChange={(e) => setGroupName(e.target.value)}
+                  />
+                </div>
+                <label htmlFor="groupPic">
+                  <AttachFile
+                    sx={{
+                      fontSize: "2rem",
+                      color: "#eee",
+                      cursor: "pointer",
+                      mx: ".5rem",
+                    }}
+                  />
+                </label>
+                <input
+                  type="file"
+                  style={{ display: "none" }}
+                  id="groupPic"
+                  onChange={(e) => setFile(e.target.files[0])}
+                />
+              </InputWrap>
+              {active && (
+                <ProgressBar
+                  file={file}
+                  setFile={setFile}
+                  action="createGroup"
+                  setActive={setActive}
+                  formData={[groupName, isChannel, false]}
+                />
+              )}
+              <ButtonWrap>
+                <ButtonDel text="Cancel" status='cancelCreateGroup' />
+                <Button_ onClick={createFunc}>Create</Button_>
+              </ButtonWrap>
+            </FormWrap>
+          </Container>
+        </Wrap>
+      )}
+    </>
   );
 };
 
@@ -130,5 +187,21 @@ const InputWrap = styled(ButtonWrap)`
         outline: none;
       }
     }
+  }
+`;
+const Button_ = styled.button`
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  margin-bottom: 1rem;
+  border-radius: 3rem;
+  font-size: 1.4rem;
+  transition: all 0.4s ease-in-out;
+  cursor: pointer;
+  &:focus,
+  &:hover {
+    outline: none;
+    background-color: green;
+    color: #fff;
   }
 `;

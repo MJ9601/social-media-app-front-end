@@ -2,6 +2,11 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   delUser: false,
+  createGroup: false,
+  showSettingGroup: false,
+  delGroup: false,
+  showSearchMsg: false,
+  showOptionMsg: false,
   status: "idle",
 };
 
@@ -13,12 +18,50 @@ export const displaySlice = createSlice({
     ToggleDelUser: (state) => {
       state.delUser = !state.delUser;
     },
-    
+    ToggleDelGroup: (state) => {
+      state.delGroup = !state.delGroup;
+    },
+    ToggleCreateGroup: (state) => {
+      state.createGroup = !state.createGroup;
+    },
+    setShowSettingGroupTrue: (state) => {
+      state.showSettingGroup = true;
+    },
+    setShowSettingGroupFalse: (state) => {
+      state.showSettingGroup = false;
+    },
+    setShowSearchMsgTrue: (state) => {
+      state.showSearchMsg = true;
+    },
+    setShowSearchMsgFalse: (state) => {
+      state.showSearchMsg = false;
+    },
+    setShowOptionMsgTrue: (state) => {
+      state.showOptionMsg = true;
+    },
+    setShowOptionMsgFalse: (state) => {
+      state.showOptionMsg = false;
+    },
   },
 });
 
-export const { ToggleDelUser } = displaySlice.actions;
+export const {
+  ToggleDelUser,
+  ToggleCreateGroup,
+  setShowSettingGroupTrue,
+  setShowSettingGroupFalse,
+  ToggleDelGroup,
+  setShowSearchMsgFalse,
+  setShowSearchMsgTrue,
+  setShowOptionMsgFalse,
+  setShowOptionMsgTrue,
+} = displaySlice.actions;
 
 export const selectDelUser = (state) => state.display.delUser;
+export const selectDelGroup = (state) => state.display.delGroup;
+export const selectCreateGroup = (state) => state.display.createGroup;
+export const selectShowSettingGroup = (state) => state.display.showSettingGroup;
+export const selectShowSearchMsg = (state) => state.display.showSearchMsg;
+export const selectShowOptionMsg = (state) => state.display.showOptionMsg;
 
 export default displaySlice.reducer;

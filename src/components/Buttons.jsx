@@ -1,16 +1,52 @@
 import React from "react";
 import styled from "styled-components";
-import { useDispatch } from "react-redux";
-import { ToggleDelUser } from "../features/displaySlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  setShowSettingGroupFalse,
+  ToggleCreateGroup,
+  ToggleDelGroup,
+  ToggleDelUser,
+} from "../features/displaySlice";
+import { delGroupFunc, delUserFunc } from "../requestAxios";
+import { LOGOUT, selectUser } from "../features/userSlice";
+import { setSelectedGroup } from "../features/groupSlice";
 
-export const Button = ({ text, action }) => {
-  return <Button_>{text}</Button_>;
-};
-export const ButtonDel = ({ text, isUser }) => {
+export const Button = ({ text, status, action, payload }) => {
   const dispatch = useDispatch();
-  return (
-    <ButtonDel_ onClick={() => dispatch(ToggleDelUser)}>{text}</ButtonDel_>
-  );
+
+  const handleClick = async () => {
+    if (status == "cancelCreateGroup") dispatch(ToggleCreateGroup());
+    else if (status == "cancelDelGroup") dispatch(ToggleDelGroup());
+    else dispatch(ToggleDelUser());
+  };
+  return <Button_ onClick={handleClick}>{text}</Button_>;
+};
+
+export const ButtonDel = ({ text, status, action, payload, setPayload }) => {
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
+
+  const handleDelClick = async () => {
+    if (status == "delUser") dispatch(ToggleDelUser());
+    else if (status == "delGroup") dispatch(ToggleDelGroup());
+    else dispatch(ToggleCreateGroup());
+
+    if (action == "deleteUser" && payload != "") {
+      // console.log(payload);
+      const resp = await delUserFunc(user._id, payload);
+      resp.status == 200 && dispatch(LOGOUT());
+      dispatch(ToggleDelUser());
+      setPayload("");
+    }
+    if (action == "deleteGroup") {
+      const resp = await delGroupFunc(user._id, payload);
+      if (resp.status == 200) {
+        dispatch(setSelectedGroup(null));
+        dispatch(setShowSettingGroupFalse());
+      }
+    }
+  };
+  return <ButtonDel_ onClick={handleDelClick}>{text}</ButtonDel_>;
 };
 
 const Button_ = styled.button`

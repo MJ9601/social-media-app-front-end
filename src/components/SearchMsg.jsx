@@ -1,12 +1,29 @@
-import { Search } from "@mui/icons-material";
+import { Close, Search } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import {
+  selectShowSearchMsg,
+  setShowSearchMsgFalse,
+} from "../features/displaySlice";
 import Message from "./Message";
 
 const SearchMsg = () => {
-  const [show, setShow] = useState(true);
+  const show = useSelector(selectShowSearchMsg);
+  const dispatch = useDispatch();
   return (
     <Wrap isShow={show}>
+      <Close
+        sx={{
+          fontSize: "2rem",
+          color: "#eee",
+          cursor: "pointer",
+          transition: "all .3s ease",
+          ":hover": { color: "red" },
+        }}
+        onClick={() => dispatch(setShowSearchMsgFalse())}
+      />
       <SearchWrap>
         <input type="text" placeholder="Search ..." />
         <Search sx={{ color: "#eee" }} />
@@ -58,4 +75,5 @@ const MsgWrap = styled.div`
   height: calc(100vh - 25rem);
   width: 100%;
   padding; .6rem;
+  overflow-y: auto;
 `;

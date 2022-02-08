@@ -1,18 +1,24 @@
 import { MoreVert } from "@mui/icons-material";
 import { Avatar, IconButton } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { setSelectedGroup } from "../features/groupSlice";
 import { selectUser } from "../features/userSlice";
+import { getCurrentGroupFunc } from "../requestAxios";
 
-const GroupCard = ({ groupInfo }) => {
+const GroupCard = ({ groupInfo, status }) => {
   const user = useSelector(selectUser);
   const [group, setGroup] = useState(groupInfo);
   const groupMembers = groupInfo?.members.length;
-  // console.log(groupInfo)
+  const dispatch = useDispatch();
+  const setCurrentGroupFunc = async () => {
+    const resp = await getCurrentGroupFunc(groupInfo._id);
+    if (resp.status == 200) dispatch(setSelectedGroup(resp.data));
+  };
 
   useEffect(() => {
-    if (groupInfo?.members.length == 2) {
+    if (groupInfo?.isPrivate) {
       setGroup(
         groupInfo?.members.filter((member) => member._id != user._id)[0]
       );
@@ -20,16 +26,24 @@ const GroupCard = ({ groupInfo }) => {
   }, [user]);
 
   return (
-    <Wrap>
+    <Wrap onClick={setCurrentGroupFunc}>
       <Avatar src={group?.imgUrl} sx={{ bgcolor: "orange" }}>
-        {groupMembers !== 2 ? group?.name[0] : group?.fullName[0]}
+        {!groupInfo?.isPrivate ? group?.name[0] : group?.fullName[0]}
       </Avatar>
       <div>
-        <h1>{groupMembers !== 2 ? group?.name : group?.fullName}</h1>
-        <p>{groupInfo?.messages[groupInfo?.messages.length - 1]?.text}</p>
+        {status == "userProfile" && (
+          <>
+            <h1>{!groupInfo?.isPrivate ? group?.name : group?.fullName}</h1>
+            <p>{groupInfo?.messages[groupInfo?.messages.length - 1]?.text}</p>
+          </>
+        )}
       </div>
-      {groupInfo?.messages.length != 0 && (
-        <ShowMsgNum>{groupInfo?.messages.length}</ShowMsgNum>
+      {status == "userProfile" && (
+        <>
+          {groupInfo?.messages.length != 0 && (
+            <ShowMsgNum>{groupInfo?.messages.length}</ShowMsgNum>
+          )}
+        </>
       )}
     </Wrap>
   );
@@ -59,7 +73,7 @@ const Wrap = styled.div`
 `;
 const ShowMsgNum = styled.div`
   position: absolute;
-  background-color: blue;
+  background-color: green;
   top: 35%;
   right: 5%;
   width: 2rem;

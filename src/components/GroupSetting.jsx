@@ -1,30 +1,69 @@
 import { ArrowForward, AttachFile, Search } from "@mui/icons-material";
 import { Avatar } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { useLoadCurrentGroup } from "../customeHooks/customeHooks";
+import {
+  setShowSettingGroupFalse,
+  setShowSettingGroupTrue,
+} from "../features/displaySlice";
+import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
+import { selectUser } from "../features/userSlice";
+import { updateGroupSettingFunc } from "../requestAxios";
 import { Button, ButtonDel } from "./Buttons";
 import GroupCard from "./GroupCard";
+import ProgressBar from "./ProgressBar";
+import UserCard from "./UserCard";
 
 const GroupSetting = () => {
+  const dispatch = useDispatch();
+  useLoadCurrentGroup();
+  const selectedGroup = useSelector(selectCurrentGroup);
+  const [groupName, setGroupName] = useState("");
+  const [active, setActive] = useState(false);
+  const [file, setFile] = useState(null);
+  const acceptTypes = ["image/png", "image/jpg", "image/jpeg"];
+  const user = useSelector(selectUser);
+
+  const updateFunc = async () => {
+    if (groupName != "") {
+      if (file && acceptTypes.includes(file.type)) setActive(true);
+      else {
+        const resp = await updateGroupSettingFunc(
+          selectedGroup._id,
+          user._id,
+          groupName,
+          ""
+        );
+        if (resp.status == 200) {
+          dispatch(setSelectedGroup(resp.data));
+          dispatch(setShowSettingGroupTrue());
+        }
+      }
+    }
+  };
   return (
     <Wrapper>
       <Wrap>
         <div>
-          <Avatar src="">name</Avatar>
+          <Avatar src={selectedGroup?.imgUrl}>{selectedGroup?.name[0]}</Avatar>
           <div>
-            <h1>name</h1>
-            <p>members</p>
+            <h1>{selectedGroup?.name}</h1>
+            <p>{selectedGroup?.members.length}</p>
           </div>
         </div>
         <ArrowForward
           sx={{ color: "#eee", fontSize: "2rem", cursor: "pointer" }}
-          // onClick={() => setShowSetting(false)}
+          onClick={() => dispatch(setShowSettingGroupFalse())}
         />
       </Wrap>
       <Container>
         <h1>Members</h1>
         <DisplayWrap>
-          <GroupCard />
+          {selectedGroup?.members.map((member) => (
+            <UserCard key={member._id} status="groupMember" userInfo={member} />
+          ))}
         </DisplayWrap>
       </Container>
       <Container>
@@ -43,7 +82,10 @@ const GroupSetting = () => {
           <InputWrap>
             <div>
               <label htmlFor="">Name</label>
-              <input type="text" />
+              <input
+                type="text"
+                onChange={(e) => setGroupName(e.target.value)}
+              />
             </div>
             <label htmlFor="groupPic">
               <AttachFile
@@ -55,13 +97,27 @@ const GroupSetting = () => {
                 }}
               />
             </label>
-            <input type="file" style={{ display: "none" }} id="groupPic" />
+            <input
+              type="file"
+              style={{ display: "none" }}
+              id="groupPic"
+              onChange={(e) => setFile(e.target.files[0])}
+            />
           </InputWrap>
+          {active && (
+            <ProgressBar
+              file={file}
+              setFile={setFile}
+              action="updateGroup"
+              setActive={setActive}
+              formData={groupName}
+            />
+          )}
 
-          <Button text="Update" />
+          <Button_ onClick={updateFunc}>Update</Button_>
         </FormWrap>
         <ButtonWrap>
-          <ButtonDel text="Delete" />
+          <ButtonDel text="Delete" status="delGroup" />
         </ButtonWrap>
       </Container>
     </Wrapper>
@@ -70,8 +126,9 @@ const GroupSetting = () => {
 
 export default GroupSetting;
 const Wrapper = styled.div`
-  height: 100%;
+  height: calc(100vh - 4.5rem);
   width: 20%;
+  overflow-y: auto;
   max-width: 50rem;
   min-width: 25rem;
   padding: 0 1.5rem;
@@ -98,6 +155,10 @@ const Wrapper = styled.div`
   }
 `;
 const Wrap = styled.div`
+  z-index: 100;
+  position: sticky;
+  background-color: rgb(25, 25, 25);
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -193,4 +254,20 @@ const InputWrap = styled.div`
 
 const ButtonWrap = styled.div`
   margin-top: 2rem;
+`;
+const Button_ = styled.button`
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  margin-bottom: 1rem;
+  border-radius: 3rem;
+  font-size: 1.4rem;
+  transition: all 0.4s ease-in-out;
+  cursor: pointer;
+  &:focus,
+  &:hover {
+    outline: none;
+    background-color: green;
+    color: #fff;
+  }
 `;

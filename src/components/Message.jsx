@@ -1,11 +1,17 @@
 import { KeyboardArrowDown, Reply } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectUser } from "../features/userSlice";
 
-const Message = ({ isSearch }) => {
-  const [isUser, setIsUser] = useState(false);
+const Message = ({ isSearch, message }) => {
+  const user = useSelector(selectUser);
+
+  const isUser = message?.creater?._id == user._id ? true : false;
   const [showOp, setShowOp] = useState(false);
+  const date = new Date(message?.updatedAt);
+
   return (
     <Wrap isUser={isUser} isSearch={isSearch}>
       <ContentWrap isUser={isUser}>
@@ -23,7 +29,7 @@ const Message = ({ isSearch }) => {
             />
             {showOp && (
               <OptionWrapper>
-                <h3>Replay</h3>
+                <h3>Reply</h3>
                 {isUser && (
                   <>
                     <h3>Delete</h3>
@@ -34,12 +40,23 @@ const Message = ({ isSearch }) => {
             )}
           </>
         )}
-        <h2>sender</h2>
-        <h1>
-          Lorem ipsum dolor sit amet consectetur adipisicing elit. Ratione,
-          dolore?Lorem ipsum dolor sit amet.
-        </h1>
-        <p>date</p>
+        {message?.fileUrl && (
+          <FileWrapper>
+            {message?.fileType == "image" && <Img src={message?.fileUrl} />}
+            {message?.fileType == "video" && (
+              <Video src={message?.fileUrl} controls />
+            )}
+            {message?.fileType == "audio" && (
+              <Audio src={message?.fileUrl} controls />
+            )}
+          </FileWrapper>
+        )}
+        <H2>{message?.creater.fullName}</H2>
+        <h1>{message?.text}</h1>
+
+        <p>
+          {date.toLocaleTimeString()} {date.toLocaleDateString()}
+        </p>
       </ContentWrap>
       {!isSearch && (
         <IconButton sx={{ ml: ".4rem" }}>
@@ -69,14 +86,9 @@ const ContentWrap = styled.div`
   position: relative;
   padding: 0.5rem 1.5rem;
   border-radius: 1rem;
-  background-color: ${(props) => (props.isUser ? "green" : "#eee")};
+  background-color: ${(props) => (props.isUser ? "var(--primary)" : "#eee")};
   width: 100%;
-  > h2 {
-    margin-top: -2.3rem;
-    color: #fff;
-    font-weight: 400;
-    font-size: 1.2rem;
-  }
+  position: relative;
   > h1 {
     margin-top: 0.5rem;
     font-size: 1.4rem;
@@ -90,7 +102,16 @@ const ContentWrap = styled.div`
     font-size: 1.2rem;
   }
 `;
-
+const H2 = styled.h2`
+  position: absolute;
+  top: -2rem;
+  left: 0.4rem;
+  width: 100%;
+  white-space: nowrap;
+  color: #fff;
+  font-weight: 400;
+  font-size: 1.2rem;
+`;
 const OptionWrapper = styled.div`
   position: absolute;
   background-color: #222;
@@ -99,6 +120,7 @@ const OptionWrapper = styled.div`
   width: 7rem;
   border-radius: 0.4rem;
   padding: 0.4rem 0.6rem;
+  z-index: 100;
   > h3 {
     cursor: pointer;
     font-size: 1.4rem;
@@ -108,7 +130,27 @@ const OptionWrapper = styled.div`
     font-weight: 400;
     transition: all 0.4s ease;
     &:hover {
-      color: green;
+      color: #3ccb25;
     }
   }
+`;
+const FileWrapper = styled.div`
+  margin-top: 1rem;
+  margin-right: 2rem;
+`;
+
+const Img = styled.img`
+  width: 28rem;
+  object-fit: contain;
+  border-radius: 0.5rem;
+`;
+const Video = styled.video`
+  width: 28rem;
+  object-fit: contain;
+  border-radius: 0.5rem;
+`;
+const Audio = styled.audio`
+  width: 28rem;
+  object-fit: contain;
+  border-radius: 0.5rem;
 `;

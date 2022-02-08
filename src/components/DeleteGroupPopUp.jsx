@@ -1,43 +1,34 @@
 import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { selectDelUser } from "../features/displaySlice";
+import { selectDelGroup, selectDelUser } from "../features/displaySlice";
+import { selectCurrentGroup } from "../features/groupSlice";
 import { selectUser } from "../features/userSlice";
 import { Button, ButtonDel } from "./Buttons";
 
-const DeletePopUp = () => {
-  const delUser = useSelector(selectDelUser);
-  const user = useSelector(selectUser);
-  const [pass, setPass] = useState("");
+const DeleteGroupPopUp = () => {
+  const delGroup = useSelector(selectDelGroup);
+  const selectedGroup = useSelector(selectCurrentGroup);
+
   return (
     <>
-      {delUser && (
+      {delGroup && (
         <Wrap>
           <Container>
             <h2>
               You are about to delete
-              {delUser && (
-                <>
-                  {" "}
-                  <span>{delUser && user.fullName}</span> account.
-                </>
-              )}
-              The process is irreversible.
+              <span> {delGroup && selectedGroup.name}</span> Group. The process
+              is irreversible.
             </h2>
             <p>Are you sure? </p>
             <div>
-              <input
-                type="password"
-                onChange={(e) => setPass(e.target.value)}
-                placeholder="Password .."
-              />
               <div>
-                <Button text="Cencel" isUser={true} />
+                <Button text="Cencel" status="cancelDelGroup" />
                 <ButtonDel
                   text="Delete"
-                  action="deleteUser"
-                  payload={pass}
-                  setPayload={setPass}
+                  action="deleteGroup"
+                  payload={selectedGroup._id}
+                  status="delGroup"
                 />
               </div>
             </div>
@@ -48,7 +39,7 @@ const DeletePopUp = () => {
   );
 };
 
-export default DeletePopUp;
+export default DeleteGroupPopUp;
 
 const Wrap = styled.div`
   position: absolute;

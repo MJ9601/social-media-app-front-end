@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { selectShowSettingGroup } from "../features/displaySlice";
 import CreateGroupPopUp from "./CreateGroupPopUp";
+import DeleteGroupPopUp from "./DeleteGroupPopUp";
 import DeletePopUp from "./DeletePopUp";
 import ForwardPopUp from "./ForwardPopUp";
 import GroupSetting from "./GroupSetting";
@@ -8,13 +11,14 @@ import RoomDis from "./RoomDis";
 import Sidebar from "./Sidebar";
 
 const Home = () => {
-  const [isGroup, setIsGroup] = useState(false);
+  const showSettingGroup = useSelector(selectShowSettingGroup);
   return (
     <Wrap>
-      {!isGroup ? <Sidebar /> : <GroupSetting />}
+      {!showSettingGroup ? <Sidebar /> : <GroupSetting />}
       <RoomDis />
-      {/* <DeletePopUp /> */}
-      {/* <CreateGroupPopUp /> */}
+      <DeletePopUp />
+      <CreateGroupPopUp />
+      <DeleteGroupPopUp />
       {/* <ForwardPopUp /> */}
     </Wrap>
   );

@@ -3,6 +3,7 @@ import { Avatar, IconButton } from "@mui/material";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { useLoadCurrentUser } from "../customeHooks/customeHooks";
 import { selectUser } from "../features/userSlice";
 import { Button } from "./Buttons";
 import GroupCard from "./GroupCard";
@@ -13,6 +14,7 @@ const Sidebar = () => {
   const [isShow, setIsShow] = useState(false);
   const [showSetting, setShowSetting] = useState(false);
   const user = useSelector(selectUser);
+  useLoadCurrentUser();
 
   return (
     <Wrap isShow={isShow}>
@@ -43,10 +45,16 @@ const Sidebar = () => {
             <input type="text" placeholder="Search ..." />
             <Search sx={{ color: "#eee" }} />
           </SearchWrap>
+          <ButtonWrapper>
+            <Button text="+ Create Group or Channel" isUser={false} />
+          </ButtonWrapper>
           <GroupWrapper>
-            <Button text="+ Create Group or Channel" />
             {user?.groups.map((group) => (
-              <GroupCard key={group._id} groupInfo={group} />
+              <GroupCard
+                key={group._id}
+                groupInfo={group}
+                status="userProfile"
+              />
             ))}
           </GroupWrapper>
         </>
@@ -131,6 +139,9 @@ const SearchWrap = styled.div`
 `;
 const GroupWrapper = styled.div`
   width: 100%;
-  height: calc(100% - 11rem);
+  height: calc(100vh - 23rem);
   overflow-y: auto;
+`;
+const ButtonWrapper = styled.div`
+  margin: 1.2rem 0;
 `;
