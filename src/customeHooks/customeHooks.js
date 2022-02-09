@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectShowSettingGroup } from "../features/displaySlice";
 import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
@@ -38,3 +38,23 @@ export const useLoadCurrentGroup = () => {
 // useLoadGroupmessages
 
 // useLoadUsers
+
+// cancel click activation
+
+export const useCancelCliking = (ref) => {
+  const [isClickedInside, setIsClickedInside] = useState();
+
+  useEffect(() => {
+    const handleClickOutSide = (e) => {
+      ref.current && !ref.current.contains(e.target)
+        ? setIsClickedInside(false)
+        : setIsClickedInside(true);
+    };
+    document.addEventListener("mousedown", handleClickOutSide);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutSide);
+    };
+  }, [ref]);
+
+  return isClickedInside;
+};

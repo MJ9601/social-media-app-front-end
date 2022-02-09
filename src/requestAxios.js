@@ -164,3 +164,33 @@ export const createMsgFunc = async (
     return { status: 400, error: error };
   }
 };
+
+export const deleteMsgFunc = async (userId, msgId, groupId) => {
+  try {
+    const resp = await axios.delete(`/messages/${userId}/delete`, {
+      data: { msgId: msgId },
+    });
+    if (resp.status == 200) {
+      const resp_ = await axios.get(`/groups/${groupId}`);
+      return resp_;
+    }
+    return resp;
+  } catch (error) {
+    return { status: 400, error: error };
+  }
+};
+
+export const editMsgFunc = async (userId, msgId, text, groupId) => {
+  try {
+    const resp = await axios.put(`/messages/${userId}/edit`, {
+      msgId: msgId,
+      text: text,
+    });
+    if (resp.status == 201) {
+      const resp_ = await axios.get(`/groups/${groupId}`);
+      return resp_;
+    }
+  } catch (error) {
+    return { status: 400, error: error };
+  }
+};

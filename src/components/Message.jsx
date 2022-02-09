@@ -1,22 +1,56 @@
 import { KeyboardArrowDown, Reply } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import { useCancelCliking } from "../customeHooks/customeHooks";
+import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
+import { setCurrentMsg } from "../features/messageSlice";
 import { selectUser } from "../features/userSlice";
+import { deleteMsgFunc } from "../requestAxios";
 
 const Message = ({ isSearch, message }) => {
   const user = useSelector(selectUser);
-
+  const boxRef = useRef(null);
+  const isClicked = useCancelCliking(boxRef);
+  const currentGroup = useSelector(selectCurrentGroup);
+  const dispatch = useDispatch();
   const isUser = message?.creater?._id == user._id ? true : false;
   const [showOp, setShowOp] = useState(false);
   const date = new Date(message?.updatedAt);
+  useEffect(() => {
+    setShowOp(!isClicked && isClicked);
+  }, [isClicked]);
+
+  const deleteMsg = async () => {
+    const resp = await deleteMsgFunc(user._id, message._id, currentGroup._id);
+    if (resp.status == 200) {
+      setShowOp(false);
+      dispatch(setSelectedGroup(resp.data));
+    }
+  };
 
   return (
     <Wrap isUser={isUser} isSearch={isSearch}>
       <ContentWrap isUser={isUser}>
         {!isSearch && (
           <>
+            {message.onReplyTo && (
+              <ReplyWrap>
+                <div>
+                  <p>{message.onReplyTo?.text}</p>
+                  {message.onReplyTo?.fileType == "image" && (
+                    <img src={message.onReplyTo?.fileUrl} />
+                  )}
+                  {message.onReplyTo?.fileType == "video" && (
+                    <video src={message.onReplyTo?.fileUrl} />
+                  )}
+                  {message.onReplyTo?.fileType == "audio" && (
+                    <audio src={message.onReplyTo?.fileUrl} />
+                  )}
+                </div>
+              </ReplyWrap>
+            )}
             <KeyboardArrowDown
               sx={{
                 position: "absolute",
@@ -28,12 +62,26 @@ const Message = ({ isSearch, message }) => {
               onClick={() => setShowOp(true)}
             />
             {showOp && (
-              <OptionWrapper>
-                <h3>Reply</h3>
+              <OptionWrapper ref={boxRef}>
+                <h3
+                  onClick={() => {
+                    dispatch(setCurrentMsg({ ...message, action: "reply" }));
+                    setShowOp(false);
+                  }}
+                >
+                  Reply
+                </h3>
                 {isUser && (
                   <>
-                    <h3>Delete</h3>
-                    <h3>Edit</h3>
+                    <h3 onClick={deleteMsg}>Delete</h3>
+                    <h3
+                      onClick={() => {
+                        dispatch(setCurrentMsg({ ...message, action: "edit" }));
+                        setShowOp(false);
+                      }}
+                    >
+                      Edit
+                    </h3>
                   </>
                 )}
               </OptionWrapper>
@@ -84,7 +132,7 @@ const Wrap = styled.div`
 
 const ContentWrap = styled.div`
   position: relative;
-  padding: 0.5rem 1.5rem;
+  padding: 0.5rem 0rem;
   border-radius: 1rem;
   background-color: ${(props) => (props.isUser ? "var(--primary)" : "#eee")};
   width: 100%;
@@ -92,6 +140,7 @@ const ContentWrap = styled.div`
   > h1 {
     margin-top: 0.5rem;
     font-size: 1.4rem;
+    padding-left: 1.4rem;
     font-weight: 500;
     margin-bottom: 0.4rem;
     padding-right: 2.5rem;
@@ -111,6 +160,7 @@ const H2 = styled.h2`
   color: #fff;
   font-weight: 400;
   font-size: 1.2rem;
+  padding-left: 1.4rem;
 `;
 const OptionWrapper = styled.div`
   position: absolute;
@@ -143,14 +193,44 @@ const Img = styled.img`
   width: 28rem;
   object-fit: contain;
   border-radius: 0.5rem;
+  margin-left: 1rem;
+  margin-right: 1.2rem;
 `;
 const Video = styled.video`
   width: 28rem;
   object-fit: contain;
   border-radius: 0.5rem;
+  margin-left: 1rem;
+  margin-right: 1.2rem;
 `;
 const Audio = styled.audio`
   width: 28rem;
   object-fit: contain;
   border-radius: 0.5rem;
+  margin-left: 1rem;
+  margin-right: 1.2rem;
+  color: var(--primary);
+`;
+const ReplyWrap = styled.div`
+  width: 100%;
+  padding: 0;
+  > div {
+    width: 100%;
+    background-color: green;
+    padding: 1rem;
+    margin-top: 2rem;
+    > p {
+      font-size: 1.4rem;
+      width: 20rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    > img,
+    video,
+    audio {
+      height: 10rem;
+      object-fit: contain;
+    }
+  }
 `;

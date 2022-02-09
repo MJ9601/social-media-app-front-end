@@ -28,6 +28,7 @@ code {
   font-size: 2rem !important;
   cursor: pointer !important;
   display: none !important;
+  
 }
 @media (max-width: 610px) {
   .setting-icon {

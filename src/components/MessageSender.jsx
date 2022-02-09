@@ -1,39 +1,63 @@
-import { AttachFile, Mic } from "@mui/icons-material";
+import { AttachFile, Close, Mic } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { useLoadCurrentGroup } from "../customeHooks/customeHooks";
 import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
+import { selectCurrentMsg, setCurrentMsg } from "../features/messageSlice";
 import { selectUser } from "../features/userSlice";
-import { createMsgFunc } from "../requestAxios";
+import { createMsgFunc, editMsgFunc } from "../requestAxios";
 import ProgressBar from "./ProgressBar";
 
 const MessageSender = () => {
+  const currentMsg = useSelector(selectCurrentMsg);
   const [active, setActive] = useState(false);
   const [file, setFile] = useState(null);
   const [msgText, setMsgText] = useState("");
+  const [replyMsg, setReplyMsg] = useState(null);
   const user = useSelector(selectUser);
   const currentGroup = useSelector(selectCurrentGroup);
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    currentMsg?.action == "edit" && setMsgText(currentMsg?.text);
+    currentMsg?.action == "reply" && setReplyMsg(currentMsg);
+    console.log(currentMsg);
+  }, [currentMsg]);
+
   const sendMsgFunc = async (e) => {
     e.preventDefault();
-    console.log("0000");
-    if (file) setActive(true);
-    else {
-      const resp = await createMsgFunc(
+    if (currentMsg?.action == "edit") {
+      const resp = await editMsgFunc(
         user._id,
-        currentGroup._id,
+        currentMsg._id,
         msgText,
-        "",
-        "",
-        ""
+        currentGroup._id
       );
       if (resp.status == 200) {
         setMsgText("");
         dispatch(setSelectedGroup(resp.data));
       }
+    } else {
+      if (file) setActive(true);
+      else {
+        const resp = await createMsgFunc(
+          user._id,
+          currentGroup._id,
+          msgText,
+          "",
+          "",
+          !replyMsg ? "" : replyMsg?._id
+        );
+        if (resp.status == 200) {
+          setMsgText("");
+          dispatch(setSelectedGroup(resp.data));
+        }
+      }
     }
+    dispatch(setCurrentMsg(null));
+    setReplyMsg(null);
   };
   return (
     <Wrapper>
@@ -43,8 +67,38 @@ const MessageSender = () => {
           setFile={setFile}
           action="createMsg"
           setActive={setActive}
-          formData={{ msgText: msgText, onReplyTo: "", setMsgText: setMsgText }}
+          formData={{
+            msgText: msgText,
+            onReplyTo: !replyMsg ? "" : replyMsg?._id,
+            setMsgText: setMsgText,
+          }}
         />
+      )}
+      {replyMsg?.action == "reply" && (
+        <ReplyWrap>
+          <Close
+            sx={{
+              position: "absolute",
+              right: "2rem",
+              top: "1rem",
+              fontSize: "1.8rem",
+              cursor: "pointer",
+              ":hover": {
+                color: "red",
+              },
+            }}
+            onClick={() => {
+              setReplyMsg(null);
+              dispatch(setCurrentMsg(null));
+            }}
+          />
+          <h3>{replyMsg?.creater?.fullName}:</h3>
+
+          <p>{replyMsg?.text}</p>
+          {replyMsg?.fileType == "image" && <img src={replyMsg?.fileUrl} />}
+          {replyMsg?.fileType == "video" && <video src={replyMsg?.fileUrl} />}
+          {replyMsg?.fileType == "audio" && <audio src={replyMsg?.fileUrl} />}
+        </ReplyWrap>
       )}
       <Wrap>
         <form action="">
@@ -116,5 +170,45 @@ const Container = styled.div`
     &:focus {
       outline: none;
     }
+  }
+`;
+const ReplyWrap = styled.div`
+  width: 100%;
+  background-color: #eee;
+  padding: 0 2rem;
+  position: relative;
+  border-top-left-radius: 0.9rem;
+  border-top-right-radius: 0.9rem;
+  background-color: rgba(50, 50, 50, 1);
+  > h3 {
+    color: #eee;
+    position: absolute;
+    top: -2.2rem;
+    font-size: 1.4rem;
+    font-weight: 500;
+  }
+  > p {
+    color: #eee;
+    font-size: 1.3rem;
+    padding-top: 1rem;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  > img {
+    height: 10rem;
+    object-fit: contain;
+    border-radius: 0.5rem;
+  }
+  > video {
+    height: 10rem;
+    object-fit: contain;
+    border-radius: 0.5rem;
+  }
+  > audio {
+    height: 10rem;
+    object-fit: contain;
+    border-radius: 0.5rem;
   }
 `;

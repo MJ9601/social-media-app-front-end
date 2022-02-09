@@ -19,7 +19,7 @@ const RoomDis = () => {
           <Container>
             <MsgWrapper>
               <MsgContainer>
-                {currentGroup.messages.map((message) => (
+                {currentGroup?.messages.map((message) => (
                   <Message key={message?._id} message={message} />
                 ))}
               </MsgContainer>
