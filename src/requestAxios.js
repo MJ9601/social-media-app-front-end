@@ -226,7 +226,7 @@ export const removeMemberFromGroupFunc = async (adminId, groupId, memberId) => {
       `/groups/${adminId}/deleteMembers?groupId=${groupId}`,
       { userId: memberId }
     );
-    if (resp.status == 201) {
+    if (resp.status == 200) {
       const resp_ = await axios.get(`/groups/${groupId}`);
       return resp_;
     }

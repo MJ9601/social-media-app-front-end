@@ -16,6 +16,7 @@ const UserCard = ({ status, userInfo }) => {
   const user = useSelector(selectUser);
   const currentGroup = useSelector(selectCurrentGroup);
   const dispatch = useDispatch();
+  const groupAdmin = user._id == selectedGroup.admin ? true : false;
 
   const addMemberToGroup = async () => {
     const resp = await addMemberToGroupFunc(
@@ -48,17 +49,25 @@ const UserCard = ({ status, userInfo }) => {
         <h1>{userInfo?.fullName}</h1>
         <p>{userInfo?.customeId}</p>
       </div>
-      {!isAdmin && (
-        <section>
-          {status != "groupSearch" && status != "userSearch" && (
-            <Button onClick={removeMemberFromGroup}>Remove</Button>
-          )}
+
+      <section>
+        {!isAdmin && (
+          <>
+            {groupAdmin &&
+              status != "groupSearch" &&
+              status != "userSearch" && (
+                <Button onClick={removeMemberFromGroup}>Remove</Button>
+              )}
+
+            {status !== "groupMember" && status != "userSearch" && (
+              <Button onClick={addMemberToGroup}>Add </Button>
+            )}
+          </>
+        )}
+        {user._id !== userInfo._id && (
           <Button onClick={startPrivateChat}>Start chating</Button>
-          {status !== "groupMember" && status != "userSearch" && (
-            <Button onClick={addMemberToGroup}>Add </Button>
-          )}
-        </section>
-      )}
+        )}
+      </section>
     </Wrap>
   );
 };
