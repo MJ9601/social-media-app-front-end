@@ -9,6 +9,7 @@ import {
   setShowSettingGroupTrue,
 } from "../features/displaySlice";
 import { selectCurrentGroup } from "../features/groupSlice";
+import { setGroupMsgs } from "../features/messageSlice";
 import { selectUser } from "../features/userSlice";
 
 const HeaderRoom = () => {
@@ -17,19 +18,20 @@ const HeaderRoom = () => {
   const user = useSelector(selectUser);
   const currentGroup = useSelector(selectCurrentGroup);
   const [group, setGroup] = useState(currentGroup);
+
   useEffect(() => {
-    currentGroup?.isPrivate
-      ? setGroup(
-          currentGroup.members.filter((member) => member._id != user._id)[0]
-        )
-      : setGroup(currentGroup);
-  }, [group]);
+    if (currentGroup?.isPrivate) {
+      setGroup(
+        currentGroup.members.filter((member) => member._id != user._id)[0]
+      );
+    } else setGroup(currentGroup);
+  });
   return (
     <Wrap>
       <ArrowBack className="setting-icon" />
       <div>
-        <Avatar src={currentGroup?.imgUrl}>
-          {currentGroup?.isPrivate ? group?.fullName[0] : currentGroup?.name[0]}
+        <Avatar src={group?.imgUrl}>
+          {!currentGroup?.isPrivate && currentGroup?.name[0]}
         </Avatar>
         <div>
           <h1>
@@ -39,7 +41,12 @@ const HeaderRoom = () => {
         </div>
       </div>
       <div>
-        <IconButton onClick={() => dispatch(setShowSearchMsgTrue())}>
+        <IconButton
+          onClick={() => {
+            dispatch(setShowSearchMsgTrue());
+            dispatch(setGroupMsgs(currentGroup?.messages));
+          }}
+        >
           <Search sx={{ fontSize: "2rem" }} />
         </IconButton>
         <IconButton onClick={() => dispatch(setShowSettingGroupTrue())}>

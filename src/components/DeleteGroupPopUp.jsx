@@ -17,8 +17,11 @@ const DeleteGroupPopUp = () => {
           <Container>
             <h2>
               You are about to delete
-              <span> {delGroup && selectedGroup.name}</span> Group. The process
-              is irreversible.
+              <span>
+                {" "}
+                {!selectedGroup.isPrivate ? selectedGroup.name : "Chat"}
+              </span>{" "}
+              Group. The process is irreversible.
             </h2>
             <p>Are you sure? </p>
             <div>

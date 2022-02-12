@@ -1,22 +1,48 @@
-import { Search } from "@mui/icons-material";
+import { Close, Search } from "@mui/icons-material";
 import React from "react";
 import styled from "styled-components";
 import GroupCard from "./GroupCard";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  selectShowForwardWin,
+  setShowForwardWinFalse,
+} from "../features/displaySlice";
+import { selectUser } from "../features/userSlice";
+import { setCurrentMsg } from "../features/messageSlice";
 
 const ForwardPopUp = () => {
+  const showForwardWin = useSelector(selectShowForwardWin);
+  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   return (
-    <Wrap>
-      <Container>
-        <h1>Forward to: </h1>
-        <SearchWrap>
-          <input type="text" placeholder="Search ..." />
-          <Search sx={{ color: "#eee" }} />
-        </SearchWrap>
-        <DisplayWrap>
-          <GroupCard />
-        </DisplayWrap>
-      </Container>
-    </Wrap>
+    <>
+      {showForwardWin && (
+        <Wrap>
+          <Container>
+            <h1>
+              <span>Forward to: </span>
+              <Close
+                sx={{
+                  fontSize: "2rem",
+                  transition: "all .3s ease",
+                  cursor: "pointer",
+                  ":hover": { color: "red" },
+                }}
+                onClick={() => {
+                  dispatch(setShowForwardWinFalse());
+                  dispatch(setCurrentMsg(null));
+                }}
+              />
+            </h1>
+            <DisplayWrap>
+              {user?.groups.map((group) => (
+                <GroupCard key={group._id} groupInfo={group} status="forward" />
+              ))}
+            </DisplayWrap>
+          </Container>
+        </Wrap>
+      )}
+    </>
   );
 };
 
@@ -34,33 +60,18 @@ const Container = styled.div`
   border-radius: 0.8rem;
   width: 30rem;
   > h1 {
-    margin-left: 1.4rem;
+    padding: 0 1.4rem;
     color: #eee;
     font-weight: 500;
     font-size: 1.7rem;
-  }
-`;
-const SearchWrap = styled.div`
-  margin: 1.4rem 0.3rem;
-  border: 0.1rem solid #000;
-  border-radius: 3rem;
-  padding: 0.3rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  > input {
-    background-color: transparent;
-    color: #fff;
-    width: 85%;
-    border: none;
-    padding: 0.4rem;
-    margin-left: 0.3rem;
-    &:focus {
-      outline: none;
-    }
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
   }
 `;
 const DisplayWrap = styled.div`
+  margin-top: 2rem;
   width: 100%;
   height: 50vh;
   overflow-y: auto;

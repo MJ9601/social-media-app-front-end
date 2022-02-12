@@ -1,29 +1,62 @@
 import { Avatar } from "@mui/material";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
-import { selectCurrentGroup } from "../features/groupSlice";
+import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
+import { selectUser } from "../features/userSlice";
+import {
+  addMemberToGroupFunc,
+  removeMemberFromGroupFunc,
+  startPrivateChatFunc,
+} from "../requestAxios";
 
 const UserCard = ({ status, userInfo }) => {
   const selectedGroup = useSelector(selectCurrentGroup);
   const [isAdmin, setIsAdmin] = useState(false);
+  const user = useSelector(selectUser);
+  const currentGroup = useSelector(selectCurrentGroup);
+  const dispatch = useDispatch();
+
+  const addMemberToGroup = async () => {
+    const resp = await addMemberToGroupFunc(
+      user?._id,
+      currentGroup?._id,
+      userInfo?._id
+    );
+    dispatch(setSelectedGroup(resp.data));
+  };
+  const removeMemberFromGroup = async () => {
+    const resp = await removeMemberFromGroupFunc(
+      user?._id,
+      currentGroup?._id,
+      userInfo?._id
+    );
+    dispatch(setSelectedGroup(resp.data));
+  };
+  const startPrivateChat = async () => {
+    const resp = await startPrivateChatFunc(user?._id, userInfo?._id);
+    if (resp.status == 200) dispatch(setSelectedGroup(resp.data));
+  };
+
   useEffect(() => {
-    if (userInfo._id == selectedGroup.admin) setIsAdmin(true);
+    if (userInfo?._id == selectedGroup?.admin) setIsAdmin(true);
   }, []);
   return (
     <Wrap>
-      <Avatar src={userInfo?.imgUrl} sx={{ bgcolor: "orange" }}>
-        {userInfo?.fullName[0]}
-      </Avatar>
+      <Avatar src={userInfo?.imgUrl} sx={{ bgcolor: "orange" }}></Avatar>
       <div>
         <h1>{userInfo?.fullName}</h1>
         <p>{userInfo?.customeId}</p>
       </div>
       {!isAdmin && (
         <section>
-          {status != "groupSearch" && <Button>Remove</Button>}
-          <Button>Start chating</Button>
-          {status !== "groupMember" && <Button>Add </Button>}
+          {status != "groupSearch" && status != "userSearch" && (
+            <Button onClick={removeMemberFromGroup}>Remove</Button>
+          )}
+          <Button onClick={startPrivateChat}>Start chating</Button>
+          {status !== "groupMember" && status != "userSearch" && (
+            <Button onClick={addMemberToGroup}>Add </Button>
+          )}
         </section>
       )}
     </Wrap>
@@ -58,7 +91,7 @@ const Wrap = styled.div`
     background-color: transparent;
     top: 0;
     right: 0;
-    width: 70%;
+    width: 90%;
     height: 100%;
     padding-top: 0.1rem;
     font-size: 1.2rem;

@@ -3,18 +3,45 @@ import { Avatar, IconButton } from "@mui/material";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
-import { useLoadCurrentUser } from "../customeHooks/customeHooks";
-import { selectUser } from "../features/userSlice";
+import {
+  useLoadAllUsers,
+  useLoadCurrentUser,
+} from "../customeHooks/customeHooks";
+import { selectAllUsers, selectUser } from "../features/userSlice";
 import { Button } from "./Buttons";
 import GroupCard from "./GroupCard";
 import GroupSetting from "./GroupSetting";
 import Setting from "./Setting";
+import UserCard from "./UserCard";
 
 const Sidebar = () => {
+  useLoadCurrentUser();
+  useLoadAllUsers();
+  const allUsers = useSelector(selectAllUsers);
   const [isShow, setIsShow] = useState(false);
   const [showSetting, setShowSetting] = useState(false);
   const user = useSelector(selectUser);
-  useLoadCurrentUser();
+  const [searchActive, setSearchActive] = useState(false);
+  const [searchUsers, setSearchUsers] = useState("");
+  const [results, setResults] = useState([]);
+
+  const handleSearch = (e) => {
+    setSearchUsers(e.target.value);
+    // console.log(e.target.value);
+    if (e.target.value.length > 2) {
+      setSearchActive(true);
+      e.target.value[0] == "@"
+        ? setResults(
+            allUsers.filter((user) => user?.customeId?.includes(e.target.value))
+          )
+        : setResults(
+            allUsers.filter((user) => user?.fullName.includes(e.target.value))
+          );
+    } else if (e.target.value.length < 2) {
+      setResults([]);
+      setSearchActive(false);
+    }
+  };
 
   return (
     <Wrap isShow={isShow}>
@@ -42,9 +69,28 @@ const Sidebar = () => {
             </IconButton>
           </UserInfoWrap>
           <SearchWrap>
-            <input type="text" placeholder="Search ..." />
+            <input
+              type="text"
+              placeholder="Search ..."
+              value={searchUsers}
+              onChange={handleSearch}
+            />
             <Search sx={{ color: "#eee" }} />
           </SearchWrap>
+          {searchActive && (
+            <ResultsDis>
+              {results.map(
+                (member) =>
+                  member?._id != user?._id && (
+                    <UserCard
+                      key={member._id}
+                      status="userSearch"
+                      userInfo={member}
+                    />
+                  )
+              )}
+            </ResultsDis>
+          )}
           <ButtonWrapper>
             <Button text="+ Create Group or Channel" isUser={false} />
           </ButtonWrapper>
@@ -68,7 +114,8 @@ const Sidebar = () => {
 
 export default Sidebar;
 const Wrap = styled.div`
-  height: 100%;
+  height: calc(100vh - 4.5rem);
+  overflow-y: auto;
   width: 20%;
   max-width: 50rem;
   min-width: 25rem;
@@ -144,4 +191,10 @@ const GroupWrapper = styled.div`
 `;
 const ButtonWrapper = styled.div`
   margin: 1.2rem 0;
+`;
+const ResultsDis = styled.div`
+  height: 20rem;
+  width: 100%;
+  margin-top: 1.4rem;
+  overflow-y: auto;
 `;

@@ -3,18 +3,35 @@ import { Avatar, IconButton } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import {
+  setShowForwardWinFalse,
+  setShowSearchMsgFalse,
+} from "../features/displaySlice";
 import { setSelectedGroup } from "../features/groupSlice";
+import { selectCurrentMsg } from "../features/messageSlice";
 import { selectUser } from "../features/userSlice";
-import { getCurrentGroupFunc } from "../requestAxios";
+import { forwardMsgFunc, getCurrentGroupFunc } from "../requestAxios";
 
 const GroupCard = ({ groupInfo, status }) => {
   const user = useSelector(selectUser);
   const [group, setGroup] = useState(groupInfo);
-  const groupMembers = groupInfo?.members.length;
   const dispatch = useDispatch();
+  const currentMsg = useSelector(selectCurrentMsg);
+
   const setCurrentGroupFunc = async () => {
-    const resp = await getCurrentGroupFunc(groupInfo._id);
-    if (resp.status == 200) dispatch(setSelectedGroup(resp.data));
+    const resp = await getCurrentGroupFunc(groupInfo?._id);
+    if (resp.status == 200) {
+      if (status == "forward") {
+        dispatch(setShowForwardWinFalse());
+        const resp_ = await forwardMsgFunc(
+          user?._id,
+          groupInfo?._id,
+          currentMsg?._id
+        );
+      }
+      dispatch(setSelectedGroup(resp.data));
+      dispatch(setShowSearchMsgFalse());
+    }
   };
 
   useEffect(() => {
@@ -28,23 +45,23 @@ const GroupCard = ({ groupInfo, status }) => {
   return (
     <Wrap onClick={setCurrentGroupFunc}>
       <Avatar src={group?.imgUrl} sx={{ bgcolor: "orange" }}>
-        {!groupInfo?.isPrivate ? group?.name[0] : group?.fullName[0]}
+        {!groupInfo?.isPrivate && group?.name[0]}
       </Avatar>
       <div>
-        {status == "userProfile" && (
+        {
           <>
             <h1>{!groupInfo?.isPrivate ? group?.name : group?.fullName}</h1>
             <p>{groupInfo?.messages[groupInfo?.messages.length - 1]?.text}</p>
           </>
-        )}
+        }
       </div>
-      {status == "userProfile" && (
+      {
         <>
           {groupInfo?.messages.length != 0 && (
             <ShowMsgNum>{groupInfo?.messages.length}</ShowMsgNum>
           )}
         </>
-      )}
+      }
     </Wrap>
   );
 };
@@ -65,6 +82,10 @@ const Wrap = styled.div`
     color: #eee;
     > h1 {
       font-weight: 500;
+      width: 17rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
   &:hover {

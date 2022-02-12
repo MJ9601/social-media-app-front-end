@@ -1,17 +1,32 @@
 import { Close, Search } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import React, { useState } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import {
   selectShowSearchMsg,
   setShowSearchMsgFalse,
 } from "../features/displaySlice";
+import { selectGroupMsgs, setGroupMsgs } from "../features/messageSlice";
 import Message from "./Message";
+import MsgSearchCard from "./MsgSearchCard";
 
 const SearchMsg = () => {
   const show = useSelector(selectShowSearchMsg);
   const dispatch = useDispatch();
+  const groupMsgs = useSelector(selectGroupMsgs);
+  const [results, setResults] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearch = (e) => {
+    setSearchValue(e.target.value);
+    if (e.target.value.length > 2) {
+      setResults(groupMsgs.filter((msg) => msg?.text.includes(e.target.value)));
+    } else if (e.target.value.length < 2) {
+      setResults([]);
+    }
+  };
   return (
     <Wrap isShow={show}>
       <Close
@@ -22,16 +37,26 @@ const SearchMsg = () => {
           transition: "all .3s ease",
           ":hover": { color: "red" },
         }}
-        onClick={() => dispatch(setShowSearchMsgFalse())}
+        onClick={() => {
+          dispatch(setShowSearchMsgFalse());
+          dispatch(setGroupMsgs(null));
+          setSearchValue("");
+          setResults([]);
+        }}
       />
       <SearchWrap>
-        <input type="text" placeholder="Search ..." />
+        <input
+          type="text"
+          placeholder="Search ..."
+          value={searchValue}
+          onChange={handleSearch}
+        />
         <Search sx={{ color: "#eee" }} />
       </SearchWrap>
       <MsgWrap>
-        <Message isSearch={true} />
-        <Message isSearch={true} />
-        <Message isSearch={true} />
+        {results.map((msg) => (
+          <MsgSearchCard isSearch={true} key={msg._id} message={msg} />
+        ))}
       </MsgWrap>
     </Wrap>
   );

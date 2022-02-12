@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import styled from "styled-components";
+import { useLoadAllUsers } from "../customeHooks/customeHooks";
 import { selectShowSettingGroup } from "../features/displaySlice";
 import CreateGroupPopUp from "./CreateGroupPopUp";
 import DeleteGroupPopUp from "./DeleteGroupPopUp";
@@ -12,6 +13,7 @@ import Sidebar from "./Sidebar";
 
 const Home = () => {
   const showSettingGroup = useSelector(selectShowSettingGroup);
+
   return (
     <Wrap>
       {!showSettingGroup ? <Sidebar /> : <GroupSetting />}
@@ -19,7 +21,7 @@ const Home = () => {
       <DeletePopUp />
       <CreateGroupPopUp />
       <DeleteGroupPopUp />
-      {/* <ForwardPopUp /> */}
+      <ForwardPopUp />
     </Wrap>
   );
 };

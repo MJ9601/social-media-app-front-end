@@ -194,3 +194,83 @@ export const editMsgFunc = async (userId, msgId, text, groupId) => {
     return { status: 400, error: error };
   }
 };
+
+export const loadAllUserFunc = async () => {
+  try {
+    const resp = await axios.get("/auth/profiles");
+    return resp;
+  } catch (error) {
+    return { status: 400, error: error };
+  }
+};
+
+export const addMemberToGroupFunc = async (adminId, groupId, memberId) => {
+  try {
+    const resp = await axios.put(
+      `/groups/${adminId}/addMembers?groupId=${groupId}`,
+      { userId: memberId }
+    );
+    if (resp.status == 201) {
+      const resp_ = await axios.get(`/groups/${groupId}`);
+      return resp_;
+    }
+    return resp;
+  } catch (err) {
+    return { status: 400, error: err };
+  }
+};
+
+export const removeMemberFromGroupFunc = async (adminId, groupId, memberId) => {
+  try {
+    const resp = await axios.put(
+      `/groups/${adminId}/deleteMembers?groupId=${groupId}`,
+      { userId: memberId }
+    );
+    if (resp.status == 201) {
+      const resp_ = await axios.get(`/groups/${groupId}`);
+      return resp_;
+    }
+    return resp;
+  } catch (err) {
+    return { status: 400, error: err };
+  }
+};
+
+export const startPrivateChatFunc = async (firstUserId, secondUserId) => {
+  try {
+    const resp = await axios.post(`/groups/privateChat`, {
+      firstUserId: firstUserId,
+      secondUserId: secondUserId,
+    });
+    if (resp.status == 200) {
+      const resp_ = await axios.get(`/groups/${resp.data._id}`);
+      return resp_;
+    }
+    return resp;
+  } catch (error) {
+    return { status: 400, error: error };
+  }
+};
+
+export const forwardMsgFunc = async (forwarderId, groupId, msgId) => {
+  try {
+    const resp = await axios.put(`/messages/forward?groupId=${groupId}`, {
+      forwarderId: forwarderId,
+      msgId: msgId,
+    });
+    return resp;
+  } catch (err) {
+    return { status: 400, error: err };
+  }
+};
+
+export const leavingGroupFunc = async (userId, groupId) => {
+  try {
+    const resp = await axios.delete(
+      `/groups/deleteMember?groupId=${groupId}&userId=${userId}`
+    );
+    return resp;
+  } catch (err) {
+    return { status: 400, error: err };
+  }
+};

@@ -7,6 +7,7 @@ const initialState = {
   delGroup: false,
   showSearchMsg: false,
   showOptionMsg: false,
+  showForwardWin: false,
   status: "idle",
 };
 
@@ -42,6 +43,12 @@ export const displaySlice = createSlice({
     setShowOptionMsgFalse: (state) => {
       state.showOptionMsg = false;
     },
+    setShowForwardWinTrue: (state) => {
+      state.showForwardWin = true;
+    },
+    setShowForwardWinFalse: (state) => {
+      state.showForwardWin = false;
+    },
   },
 });
 
@@ -55,6 +62,8 @@ export const {
   setShowSearchMsgTrue,
   setShowOptionMsgFalse,
   setShowOptionMsgTrue,
+  setShowForwardWinFalse,
+  setShowForwardWinTrue,
 } = displaySlice.actions;
 
 export const selectDelUser = (state) => state.display.delUser;
@@ -63,5 +72,6 @@ export const selectCreateGroup = (state) => state.display.createGroup;
 export const selectShowSettingGroup = (state) => state.display.showSettingGroup;
 export const selectShowSearchMsg = (state) => state.display.showSearchMsg;
 export const selectShowOptionMsg = (state) => state.display.showOptionMsg;
+export const selectShowForwardWin = (state) => state.display.showForwardWin;
 
 export default displaySlice.reducer;

@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { useCancelCliking } from "../customeHooks/customeHooks";
+import { setShowForwardWinTrue } from "../features/displaySlice";
 import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
 import { setCurrentMsg } from "../features/messageSlice";
 import { selectUser } from "../features/userSlice";
@@ -15,7 +16,10 @@ const Message = ({ isSearch, message }) => {
   const isClicked = useCancelCliking(boxRef);
   const currentGroup = useSelector(selectCurrentGroup);
   const dispatch = useDispatch();
-  const isUser = message?.creater?._id == user._id ? true : false;
+  const isUser =
+    message?.creater?._id == user._id || message?.forwardBy?._id == user._id
+      ? true
+      : false;
   const [showOp, setShowOp] = useState(false);
   const date = new Date(message?.updatedAt);
   useEffect(() => {
@@ -31,12 +35,12 @@ const Message = ({ isSearch, message }) => {
   };
 
   return (
-    <Wrap isUser={isUser} isSearch={isSearch}>
-      <ContentWrap isUser={isUser}>
+    <Wrap isUser={isUser} isSearch={isSearch} id={`${message?._id}`}>
+      <ContentWrap isUser={isUser} isSearch={isSearch}>
         {!isSearch && (
           <>
             {message.onReplyTo && (
-              <ReplyWrap>
+              <ReplyWrap href={`#${message?.onReplyTo?._id}`}>
                 <div>
                   <p>{message.onReplyTo?.text}</p>
                   {message.onReplyTo?.fileType == "image" && (
@@ -99,8 +103,15 @@ const Message = ({ isSearch, message }) => {
             )}
           </FileWrapper>
         )}
-        <H2>{message?.creater.fullName}</H2>
+        {!message?.forwardBy ? (
+          <H2>{message?.creater?.fullName}</H2>
+        ) : (
+          <H2>{message?.forwardBy?.fullName}</H2>
+        )}
         <h1>{message?.text}</h1>
+        {message?.forwardBy && (
+          <H4>Forward From {message?.creater.fullName}</H4>
+        )}
 
         <p>
           {date.toLocaleTimeString()} {date.toLocaleDateString()}
@@ -111,6 +122,10 @@ const Message = ({ isSearch, message }) => {
           {!isUser && (
             <Reply
               sx={{ transform: "rotateY(180deg)", color: "rgb(150, 150,150)" }}
+              onClick={() => {
+                dispatch(setShowForwardWinTrue());
+                dispatch(setCurrentMsg(message));
+              }}
             />
           )}
         </IconButton>
@@ -121,8 +136,9 @@ const Message = ({ isSearch, message }) => {
 
 export default Message;
 const Wrap = styled.div`
-  margin: 2.5rem 0;
-  margin-left: ${(props) => (props.isUser ? "auto" : "1rem")};
+  margin: 4rem 0;
+  margin-left: ${(props) =>
+    !props.isSearch ? (props.isUser ? "auto" : "1rem") : "1rem"};
   width: fit-content;
   height: fit-content;
   max-width: 80rem;
@@ -143,12 +159,13 @@ const ContentWrap = styled.div`
     padding-left: 1.4rem;
     font-weight: 500;
     margin-bottom: 0.4rem;
-    padding-right: 2.5rem;
+    padding-right: 3.5rem;
   }
   > p {
     width: 100;
     text-align: end;
     font-size: 1.2rem;
+    padding: 0 1rem;
   }
 `;
 const H2 = styled.h2`
@@ -157,10 +174,12 @@ const H2 = styled.h2`
   left: 0.4rem;
   width: 100%;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: #fff;
   font-weight: 400;
   font-size: 1.2rem;
-  padding-left: 1.4rem;
+  padding-left: 0.3rem;
 `;
 const OptionWrapper = styled.div`
   position: absolute;
@@ -211,9 +230,11 @@ const Audio = styled.audio`
   margin-right: 1.2rem;
   color: var(--primary);
 `;
-const ReplyWrap = styled.div`
+const ReplyWrap = styled.a`
   width: 100%;
   padding: 0;
+  color: #000;
+  text-decoration: none;
   > div {
     width: 100%;
     background-color: green;
@@ -233,4 +254,7 @@ const ReplyWrap = styled.div`
       object-fit: contain;
     }
   }
+`;
+const H4 = styled(H2)`
+  top: 100%;
 `;

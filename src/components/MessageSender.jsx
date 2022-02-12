@@ -23,7 +23,6 @@ const MessageSender = () => {
   useEffect(() => {
     currentMsg?.action == "edit" && setMsgText(currentMsg?.text);
     currentMsg?.action == "reply" && setReplyMsg(currentMsg);
-    console.log(currentMsg);
   }, [currentMsg]);
 
   const sendMsgFunc = async (e) => {
