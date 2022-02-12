@@ -198,7 +198,7 @@ router.get("/profiles", async (req, res) => {
             fullName: user.fullName,
             customeId: user.customeId,
             imgUrl: user.imgUrl,
-            userId: user._id,
+            _id: user._id,
           }))
         )
   )

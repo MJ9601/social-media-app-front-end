@@ -85,7 +85,7 @@ router.put("/forward", async (req, res) => {
       err && res.status(500).send(err);
       if (
         !firstResp.isChannel ||
-        (firstResp.isChannel && firstResp.admin == req.body.createrId)
+        (firstResp.isChannel && firstResp.admin == req.body.forwarderId)
       )
         await Group.findByIdAndUpdate(
           req.query.groupId,
@@ -108,7 +108,7 @@ router.put("/forward", async (req, res) => {
         )
           .clone()
           .catch((err) => res.status(501).send(err));
-      else if (firstResp.isChannel && firstResp.admin !== req.body.createrId)
+      else if (firstResp.isChannel && firstResp.admin !== req.body.forwarderId)
         res.status(403).send("Not Allowed");
     })
       .clone()
@@ -120,18 +120,18 @@ router.put("/forward", async (req, res) => {
 
 // delete
 
-router.delete("/:createId/delete", async (req, res) => {
+router.delete("/:createrId/delete", async (req, res) => {
   try {
     (!req.body || req.body == "") &&
       res.status(500).send("update request body");
     Message.findById(req.body?.msgId, async (err, firstResp) => {
       err && res.status(500).send(err);
-      firstResp.creater != req.params.createId
+      firstResp.creater != req.params.createrId
         ? res.status(403).send("Not Allowed!")
         : await Message.findByIdAndDelete(req.body?.msgId, (err, lastResp) =>
             err
               ? res.status(500).send(err)
-              : res.status(201).send("Message has been deleted!")
+              : res.status(200).send("Message has been deleted!")
           )
             .clone()
             .catch((err) => res.status(501).send(err));
