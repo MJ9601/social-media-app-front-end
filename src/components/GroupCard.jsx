@@ -6,6 +6,7 @@ import styled from "styled-components";
 import {
   setShowForwardWinFalse,
   setShowSearchMsgFalse,
+  setShowSidebarResponsiveFalse,
 } from "../features/displaySlice";
 import { setSelectedGroup } from "../features/groupSlice";
 import { selectCurrentMsg } from "../features/messageSlice";
@@ -31,6 +32,7 @@ const GroupCard = ({ groupInfo, status }) => {
       }
       dispatch(setSelectedGroup(resp.data));
       dispatch(setShowSearchMsgFalse());
+      dispatch(setShowSidebarResponsiveFalse());
     }
   };
 

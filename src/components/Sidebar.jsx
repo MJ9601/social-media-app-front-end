@@ -7,6 +7,7 @@ import {
   useLoadAllUsers,
   useLoadCurrentUser,
 } from "../customeHooks/customeHooks";
+import { selectShowSidebarResponsive } from "../features/displaySlice";
 import { selectAllUsers, selectUser } from "../features/userSlice";
 import { Button } from "./Buttons";
 import GroupCard from "./GroupCard";
@@ -18,7 +19,7 @@ const Sidebar = () => {
   useLoadCurrentUser();
   useLoadAllUsers();
   const allUsers = useSelector(selectAllUsers);
-  const [isShow, setIsShow] = useState(false);
+  const responsiveShow = useSelector(selectShowSidebarResponsive);
   const [showSetting, setShowSetting] = useState(false);
   const user = useSelector(selectUser);
   const [searchActive, setSearchActive] = useState(false);
@@ -44,7 +45,7 @@ const Sidebar = () => {
   };
 
   return (
-    <Wrap isShow={isShow}>
+    <Wrap responsiveShow={responsiveShow}>
       {!showSetting ? (
         <>
           <UserInfoWrap>
@@ -131,7 +132,7 @@ const Wrap = styled.div`
     background: linear-gradient(to bottom, transparent, #eee, transparent);
   }
   @media (max-width: 601px) {
-    padding-top: 0.5rem;
+    padding-top: 1.5rem;
     position: fixed;
     width: 100%;
     max-width: 100%;
@@ -139,7 +140,7 @@ const Wrap = styled.div`
     z-index: 100;
     top: 0;
     transition: all 0.3s ease-in-out;
-    left: ${(props) => (props.isShow ? 0 : "-100%")};
+    left: ${(props) => (props.responsiveShow ? 0 : "-100%")};
   }
 `;
 const UserInfoWrap = styled.div`

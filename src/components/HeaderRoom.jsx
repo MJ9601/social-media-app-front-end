@@ -5,8 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
 import { useLoadCurrentGroup } from "../customeHooks/customeHooks";
 import {
+  setShowGroupSettingResponsiveTrue,
   setShowSearchMsgTrue,
   setShowSettingGroupTrue,
+  setShowSidebarResponsiveTrue,
 } from "../features/displaySlice";
 import { selectCurrentGroup } from "../features/groupSlice";
 import { setGroupMsgs } from "../features/messageSlice";
@@ -28,7 +30,10 @@ const HeaderRoom = () => {
   });
   return (
     <Wrap>
-      <ArrowBack className="setting-icon" />
+      <ArrowBack
+        className="setting-icon"
+        onClick={() => dispatch(setShowSidebarResponsiveTrue())}
+      />
       <div>
         <Avatar src={group?.imgUrl}>
           {!currentGroup?.isPrivate && currentGroup?.name[0]}
@@ -49,7 +54,12 @@ const HeaderRoom = () => {
         >
           <Search sx={{ fontSize: "2rem" }} />
         </IconButton>
-        <IconButton onClick={() => dispatch(setShowSettingGroupTrue())}>
+        <IconButton
+          onClick={() => {
+            dispatch(setShowSettingGroupTrue());
+            dispatch(setShowGroupSettingResponsiveTrue());
+          }}
+        >
           <Settings sx={{ fontSize: "2rem" }} />
         </IconButton>
       </div>
@@ -74,6 +84,10 @@ const Wrap = styled.div`
       margin-top: -0.2rem;
       > h1 {
         font-weight: 500;
+        width: 12rem;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
       > p {
         font-size: 1.2rem;

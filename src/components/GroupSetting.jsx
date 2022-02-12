@@ -8,6 +8,8 @@ import {
   useLoadCurrentGroup,
 } from "../customeHooks/customeHooks";
 import {
+  selectShowGroupSettingResponsive,
+  setShowGroupSettingResponsiveFalse,
   setShowSettingGroupFalse,
   setShowSettingGroupTrue,
 } from "../features/displaySlice";
@@ -34,6 +36,7 @@ const GroupSetting = () => {
   const [results, setResults] = useState([]);
   const [searchWords, setSearchWords] = useState("");
   const [searchActive, setSearchActive] = useState(false);
+  const showResponsive = useSelector(selectShowGroupSettingResponsive);
 
   const handleSearch = (e) => {
     setSearchWords(e.target.value);
@@ -76,7 +79,7 @@ const GroupSetting = () => {
     }
   };
   return (
-    <Wrapper>
+    <Wrapper isShow={showResponsive}>
       <Wrap>
         <div>
           <Avatar src={selectedGroup?.imgUrl}>{selectedGroup?.name[0]}</Avatar>
@@ -89,7 +92,10 @@ const GroupSetting = () => {
         </div>
         <ArrowForward
           sx={{ color: "#eee", fontSize: "2rem", cursor: "pointer" }}
-          onClick={() => dispatch(setShowSettingGroupFalse())}
+          onClick={() => {
+            dispatch(setShowSettingGroupFalse());
+            dispatch(setShowGroupSettingResponsiveFalse());
+          }}
         />
       </Wrap>
       <Container>

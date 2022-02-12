@@ -8,6 +8,8 @@ const initialState = {
   showSearchMsg: false,
   showOptionMsg: false,
   showForwardWin: false,
+  showSidebarResponsive: true,
+  showGroupSettingResponsive: false,
   status: "idle",
 };
 
@@ -49,6 +51,18 @@ export const displaySlice = createSlice({
     setShowForwardWinFalse: (state) => {
       state.showForwardWin = false;
     },
+    setShowSidebarResponsiveTrue: (state) => {
+      state.showSidebarResponsive = true;
+    },
+    setShowSidebarResponsiveFalse: (state) => {
+      state.showSidebarResponsive = false;
+    },
+    setShowGroupSettingResponsiveTrue: (state) => {
+      state.showGroupSettingResponsive = true;
+    },
+    setShowGroupSettingResponsiveFalse: (state) => {
+      state.showGroupSettingResponsive = false;
+    },
   },
 });
 
@@ -64,6 +78,10 @@ export const {
   setShowOptionMsgTrue,
   setShowForwardWinFalse,
   setShowForwardWinTrue,
+  setShowSidebarResponsiveFalse,
+  setShowSidebarResponsiveTrue,
+  setShowGroupSettingResponsiveFalse,
+  setShowGroupSettingResponsiveTrue,
 } = displaySlice.actions;
 
 export const selectDelUser = (state) => state.display.delUser;
@@ -73,5 +91,9 @@ export const selectShowSettingGroup = (state) => state.display.showSettingGroup;
 export const selectShowSearchMsg = (state) => state.display.showSearchMsg;
 export const selectShowOptionMsg = (state) => state.display.showOptionMsg;
 export const selectShowForwardWin = (state) => state.display.showForwardWin;
+export const selectShowGroupSettingResponsive = (state) =>
+  state.display.showGroupSettingResponsive;
+export const selectShowSidebarResponsive = (state) =>
+  state.display.showSidebarResponsive;
 
 export default displaySlice.reducer;

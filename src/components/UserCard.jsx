@@ -2,6 +2,10 @@ import { Avatar } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import styled from "styled-components";
+import {
+  setShowGroupSettingResponsiveFalse,
+  setShowSidebarResponsiveFalse,
+} from "../features/displaySlice";
 import { selectCurrentGroup, setSelectedGroup } from "../features/groupSlice";
 import { selectUser } from "../features/userSlice";
 import {
@@ -37,6 +41,8 @@ const UserCard = ({ status, userInfo }) => {
   const startPrivateChat = async () => {
     const resp = await startPrivateChatFunc(user?._id, userInfo?._id);
     if (resp.status == 200) dispatch(setSelectedGroup(resp.data));
+    dispatch(setShowGroupSettingResponsiveFalse());
+    dispatch(setShowSidebarResponsiveFalse());
   };
 
   useEffect(() => {

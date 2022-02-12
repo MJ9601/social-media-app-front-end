@@ -168,6 +168,7 @@ const Form = styled.form`
       > label {
         font-size: 1.4rem;
         padding-left: 1.5rem;
+        padding-right:1rem;
         margin-bottom: 0.2rem;
       }
       > input {
