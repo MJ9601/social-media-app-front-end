@@ -156,11 +156,11 @@ router.delete("/deleteMember", async (req, res) => {
           async (err, secondResp) =>
             err
               ? res.status(500).send(err)
-              : await User.findById(req.body?.userId, async (err, thirdResp) =>
+              : await User.findById(req.query?.userId, async (err, thirdResp) =>
                   err
                     ? res.status(500).send(err)
                     : await User.findByIdAndUpdate(
-                        req.body?.userId,
+                        req.query?.userId,
                         {
                           $set: {
                             groups: thirdResp.groups.filter(

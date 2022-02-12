@@ -19,8 +19,9 @@ router.post("/createMessage", async (req, res) => {
     await Group.findById(req.query.groupId, async (err, firstResp) => {
       err && res.status(500).send(err);
       if (
-        !firstResp.isChannel ||
-        (firstResp.isChannel && firstResp.admin == req.body.createrId)
+        (!firstResp.isChannel ||
+          (firstResp.isChannel && firstResp.admin == req.body.createrId)) &&
+        firstResp.members.includes(req.body.createrId)
       )
         await newMessage.save(async (err, secondResp) =>
           err
