@@ -20,7 +20,7 @@ const UserCard = ({ status, userInfo }) => {
   const user = useSelector(selectUser);
   const currentGroup = useSelector(selectCurrentGroup);
   const dispatch = useDispatch();
-  const groupAdmin = user._id == selectedGroup.admin ? true : false;
+  const groupAdmin = user?._id == selectedGroup?.admin ? true : false;
 
   const addMemberToGroup = async () => {
     const resp = await addMemberToGroupFunc(
